@@ -1,4 +1,4 @@
-module github.com/project-flogo/device-contrib/trigger/mqtt
+module github.com/project-flogo/edge-contrib/trigger/mqtt
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.1.1

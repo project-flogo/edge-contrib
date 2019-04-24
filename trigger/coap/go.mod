@@ -1,4 +1,4 @@
-module github.com/project-flogo/device-contrib/trigger/coap
+module github.com/project-flogo/edge-contrib/trigger/coap
 
 require (
 	github.com/dustin/go-coap v0.0.0-20170214053734-ddcc80675fa4

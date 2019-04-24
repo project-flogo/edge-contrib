@@ -1,4 +1,4 @@
-module github.com/project-flogo/device-contrib/activity/gpio
+module github.com/project-flogo/edge-contrib/activity/gpio
 
 require (
 	github.com/project-flogo/core v0.9.0-beta.3

@@ -1,4 +1,4 @@
-module github.com/project-flgo/device-contrib/activity/mqtt
+module github.com/project-flgo/edge-contrib/activity/mqtt
 
 require (
 	github.com/eclipse/paho.mqtt.golang v1.2.0
