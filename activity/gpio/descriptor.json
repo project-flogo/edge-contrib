@@ -35,7 +35,7 @@
       },
   
       {
-        "name": "Pull",
+        "name": "pull",
         "type": "string",
         "allowed" : ["Up", "Down", "Off"],
         "description": "Pull the pin to the specified value (Allowed values are Up, Down, and Off)"
@@ -44,7 +44,7 @@
     "output": [
       {
         "name": "result",
-        "type": "integer",
+        "type": "int",
         "description": "The result of the operation"
       }
     ]
