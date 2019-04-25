@@ -1,7 +1,7 @@
 package mqtt
 
 import (
-	"github.com/eclipse/paho.mqtt.golang"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/project-flogo/core/activity"
 	"github.com/project-flogo/core/data/coerce"
 	"github.com/project-flogo/core/data/metadata"
@@ -32,7 +32,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, token.Error()
 	}
 
-	act := &MqttActivity{settings: settings, client: mqttClient}
+	act := &MqttActivity{client: mqttClient}
 	return act, nil
 }
 
@@ -55,11 +55,11 @@ func (a *MqttActivity) Eval(ctx activity.Context) (done bool, err error) {
 		return true, err
 	}
 
-	if token := a.client.Publish(input.Topic, byte(input.Qos), true, input.Message); token.Wait() && token.Error() != nil {
+	if token := a.client.Publish(a.settings.Topic, byte(a.settings.Qos), true, input.Message); token.Wait() && token.Error() != nil {
 		ctx.Logger().Info("Error in publishing..")
 		return true, token.Error()
 	}
-	ctx.Logger().Info("Message Published publishing..")
+	ctx.Logger().Debugf("Message %v publishing..", input.Message)
 
 	return true, nil
 }

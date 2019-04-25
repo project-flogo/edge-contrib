@@ -1,47 +1,60 @@
 {
-    "name": "tibco-coap",
+    "name": "flogo-coap",
     "type": "flogo:activity",
     "version": "0.0.1",
     "title": "Send CoAP Message",
     "description": "Simple CoAP Activity",
-    "homepage": "https://github.com/TIBCOSoftware/flogo-contrib/tree/master/activity/coap",
-    "input":[
+    "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/activity/coap",
+    "settings":[
       {
         "name": "uri",
         "type": "string",
-        "required": true
+        "required": true,
+        "description": "The URI of the service to invoke"
       },
       {
         "name": "method",
         "type": "string",
         "required": true,
-        "allowed" : ["GET", "POST", "PUT", "DELETE"]
+        "allowed" : ["GET", "POST", "PUT", "DELETE"],
+        "description": "The CoAP method to use"
       },
-      {
-        "name": "queryParams",
-        "type": "params"
-      },
+      
       {
         "name": "type",
-        "type": "string"
-      },
-      {
-        "name": "messageId",
-        "type": "integer"
+        "type": "string",
+        "description": "The type of the service"
       },
       {
         "name": "options",
-        "type": "params"
+        "type": "params",
+        "description": "The options to set"
+      }
+      
+    ],
+    "input" :[
+      {
+        "name": "queryParams",
+        "type": "params",
+        "description": "The query params of the CoAP Message"
       },
       {
         "name": "payload",
-        "type": "string"
+        "type": "string",
+        "description": "The payload of the CoAP Message"
+      },
+      {
+        "name": "messageId",
+        "type": "integer",
+        "description": "The message id"
       }
     ],
+
     "output": [
       {
         "name": "response",
-        "type": "string"
+        "type": "string",
+        "description": "The response from the service"
       }
     ]
   }

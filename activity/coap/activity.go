@@ -3,6 +3,7 @@ package coap
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"net/url"
 
 	"github.com/dustin/go-coap"
@@ -36,9 +37,8 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 	}
 
 	req := coap.Message{
-		Type:      toCoapType(s.Type),
-		Code:      toCoapCode(s.Code),
-		MessageID: uint16(s.MessageId),
+		Type: toCoapType(s.Type),
+		Code: toCoapCode(s.Method),
 	}
 
 	coapURI, err := url.Parse(s.URI)
@@ -91,10 +91,16 @@ func (act *CoAPActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 		queryStr := qp.Encode()
 		act.req.SetOption(coap.URIQuery, queryStr)
-		log.Debugf("CoAP Message: [%s] %s?%s\n", act.settings.Code, act.coapURL.Path, queryStr)
+		if input.MessageId == 0 {
+			act.req.MessageID = uint16(rand.Intn(10))
+		} else {
+			act.req.MessageID = uint16(input.MessageId)
+		}
+
+		log.Debugf("CoAP Message: [%s] %s?%s\n", act.settings.Method, act.coapURL.Path, queryStr)
 
 	} else {
-		log.Debugf("CoAP Message: [%s] %s\n", act.settings.Code, act.coapURL.Path)
+		log.Debugf("CoAP Message: [%s] %s\n", act.settings.Method, act.coapURL.Path)
 	}
 
 	c, err := coap.Dial("udp", act.coapURL.Host)

@@ -5,15 +5,15 @@ import (
 )
 
 type Settings struct {
-	Code      string            `md:"code,required"`
-	URI       string            `md:"uri,required"`
-	Type      string            `md:"type"`
-	MessageId int               `md:"messageId"`
-	Options   map[string]string `md:"options"`
+	Method  string            `md:"method,required"`
+	URI     string            `md:"uri,required"`
+	Type    string            `md:"type"`
+	Options map[string]string `md:"options"`
 }
 
 type Input struct {
 	QueryParams map[string]string `md:"queryParams"`
+	MessageId   int               `md:"messageId"`
 	Payload     string            `md:"payload"`
 }
 
@@ -25,6 +25,7 @@ func (i *Input) ToMap() map[string]interface{} {
 	return map[string]interface{}{
 		"queryParams": i.QueryParams,
 		"payload":     i.Payload,
+		"messageId":   i.MessageId,
 	}
 }
 
@@ -37,6 +38,10 @@ func (i *Input) FromMap(values map[string]interface{}) error {
 	}
 
 	i.Payload, err = coerce.ToString(values["payload"])
+	if err != nil {
+		return err
+	}
+	i.MessageId, err = coerce.ToInt(values["messageId"])
 	if err != nil {
 		return err
 	}

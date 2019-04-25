@@ -1,0 +1,66 @@
+{
+    "name": "flogo-mqtt",
+    "type": "flogo:activity",
+    "version": "0.0.1",
+    "title": "MQTT Activity",
+    "description": "Send MQTT message",
+    "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/activity/mqtt",
+    "settings":[
+        {
+          "name": "broker",
+          "type": "string",
+          "required": true,
+          "description": "The broker URL"
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": "The id of client"
+        },
+        {
+          "name": "user",
+          "type": "string",
+          "description": "The name of the user"
+        },
+        {
+          "name": "password",
+          "type": "string",
+          "description": "The password of the user"
+        },
+        {
+          "name": "store",
+          "type": "string",
+          "description": "The path containing certificates"
+        },
+        {
+          "name": "qos",
+          "type": "double",
+          "description": "The quality of service"
+        },
+        {
+          "name": "cleansess",
+          "type": "boolean",
+          "description": "Clean sesssion "
+        },
+        {
+          "name": "topic",
+          "type": "string",
+          "description": "The topic to publish to "
+        }
+      ],
+    "input": [
+        {
+          "name": "message",
+          "type": "string",
+          "description": "The message to send"
+        }
+      ],
+    "output": [
+        {
+          "name": "data",
+          "type": "object",
+          "description": "The data recieved"
+        }
+    ]
+}

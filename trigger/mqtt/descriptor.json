@@ -3,59 +3,68 @@
     "type": "flogo:trigger",
     "version": "0.0.1",
     "title": "Receive MQTT Message",
-    "author": "Michael Register <mregiste@tibco.com>",
     "description": "Simple MQTT Trigger",
-    "homepage": "https://github.com/TIBCOSoftware/flogo-contrib/tree/master/trigger/mqtt",
+    "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/trigger/mqtt",
     "settings":[
       {
         "name": "broker",
         "type": "string",
-        "required": true
+        "required": true,
+        "description": "The broker url"
       },
       {
         "name": "id",
         "type": "string",
-        "required": true
+        "required": true,
+        "description": "The id of client"
       },
       {
         "name": "user",
-        "type": "string"
+        "type": "string",
+        "description": "The username of the user"
       },
       {
         "name": "password",
-        "type": "string"
+        "type": "string",
+        "description": "The password of the user"
       },
       {
         "name": "store",
-        "type": "string"
-      },
-      {
-        "name": "qos",
-        "type": "double"
+        "type": "string",
+        "description": "The link to the certificates"
       },
       {
         "name": "cleansess",
-        "type": "boolean"
+        "type": "boolean",
+        "description": "Clean sesssion"
       }
     ],
     "output": [
       {
         "name": "message",
-        "type": "string"
+        "type": "string",
+        "description": "The message recieved"
       }
     ],
     "reply": [
       {
         "name": "data",
-        "type": "object"
+        "type": "object",
+        "description": "The data to send"
       }
     ],
     "handler": {
       "settings": [
         {
           "name": "topic",
-          "type": "string"
-        }
+          "type": "string",
+          "description": "The topic to subscribe to"
+        },
+        {
+          "name": "qos",
+          "type": "double",
+          "description": "The Quality of Service"
+        },
       ]
     }
   }
