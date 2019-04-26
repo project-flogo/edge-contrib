@@ -8,7 +8,8 @@ type Settings struct {
 	Port string `md:"port"`
 }
 type HandlerSettings struct {
-	Path string `md:"path,required"`
+	Path   string   `md:"path,required"`
+	Method []string `md:"method,required"`
 }
 
 type Output struct {

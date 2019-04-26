@@ -141,3 +141,21 @@ func (sh *serverHandler) ServeCOAP(l *net.UDPConn, a *net.UDPAddr, m *coap.Messa
 
 	return sh.handler.ServeCOAP(l, a, m)
 }
+
+func toCoapCode(method string) coap.COAPCode {
+
+	var code coap.COAPCode
+
+	switch method {
+	case "GET":
+		code = coap.GET
+	case "POST":
+		code = coap.POST
+	case "PUT":
+		code = coap.PUT
+	case "DELETE":
+		code = coap.DELETE
+	}
+
+	return code
+}
