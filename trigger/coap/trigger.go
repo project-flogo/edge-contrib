@@ -64,11 +64,11 @@ func (t *CoApTrigger) Initialize(ctx trigger.InitContext) error {
 		}
 
 		path := s.Path
-		methods := s.Method
+		method := s.Method
 
 		t.logger.Debugf("Registering handler [%s]", path)
 
-		mux.Handle(path, newActionHandler(t, handler, methods))
+		mux.Handle(path, newActionHandler(t, handler, method))
 	}
 	t.server = NewServer("udp", t.settings.Port, mux)
 
@@ -84,12 +84,13 @@ func (t *CoApTrigger) Stop() error {
 	return t.server.Stop()
 }
 
-func newActionHandler(t *CoApTrigger, handler trigger.Handler, methods []string) coap.Handler {
+func newActionHandler(t *CoApTrigger, handler trigger.Handler, method string) coap.Handler {
 
 	return coap.FuncHandler(func(conn *net.UDPConn, addr *net.UDPAddr, msg *coap.Message) *coap.Message {
 		t.logger.Debugf("CoAP Trigger: Recieved request")
 
-		if isPresent(methods, msg.Code) {
+		if msg.Code == toCoapCode(method) {
+
 			uriQuery := msg.Option(coap.URIQuery)
 			var data map[string]interface{}
 
@@ -148,14 +149,4 @@ func newActionHandler(t *CoApTrigger, handler trigger.Handler, methods []string)
 		return nil
 
 	})
-}
-
-func isPresent(arr []string, key coap.COAPCode) bool {
-
-	for _, v := range arr {
-		if key == toCoapCode(v) {
-			return true
-		}
-	}
-	return false
 }
