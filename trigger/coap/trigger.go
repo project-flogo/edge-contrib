@@ -1,6 +1,7 @@
 package coap
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net"
@@ -40,10 +41,16 @@ func (*Factory) New(config *trigger.Config) (trigger.Trigger, error) {
 
 // Trigger CoAp trigger struct
 type CoApTrigger struct {
-	server   *Server
-	settings *Settings
-	id       string
-	logger   log.Logger
+	server    *Server
+	settings  *Settings
+	resources map[string]*CoapResource
+	id        string
+	logger    log.Logger
+}
+type CoapResource struct {
+	path     string
+	attrs    map[string]string
+	handlers map[coap.COAPCode]trigger.Handler
 }
 
 func (t *CoApTrigger) Initialize(ctx trigger.InitContext) error {
@@ -51,8 +58,8 @@ func (t *CoApTrigger) Initialize(ctx trigger.InitContext) error {
 	t.logger = ctx.Logger()
 
 	mux := coap.NewServeMux()
-	//TODO .. is it neccessary?
-	//mux.Handle("/.well-known/core", coap.FuncHandler(t.handleDiscovery))
+
+	mux.Handle("/.well-known/core", coap.FuncHandler(t.handleDiscovery))
 
 	// Init handlers
 	for _, handler := range ctx.GetHandlers() {
@@ -67,8 +74,16 @@ func (t *CoApTrigger) Initialize(ctx trigger.InitContext) error {
 		method := s.Method
 
 		t.logger.Debugf("Registering handler [%s]", path)
+		resource, exists := t.resources[path]
 
-		mux.Handle(path, newActionHandler(t, handler, method))
+		if !exists {
+			resource = &CoapResource{path: path, attrs: make(map[string]string), handlers: make(map[coap.COAPCode]trigger.Handler)}
+			t.resources[path] = resource
+		}
+
+		resource.handlers[toCoapCode(method)] = handler
+
+		mux.Handle(path, newActionHandler(t, resource))
 	}
 	t.server = NewServer("udp", t.settings.Port, mux)
 
@@ -84,69 +99,129 @@ func (t *CoApTrigger) Stop() error {
 	return t.server.Stop()
 }
 
-func newActionHandler(t *CoApTrigger, handler trigger.Handler, method string) coap.Handler {
+func newActionHandler(t *CoApTrigger, resource *CoapResource) coap.Handler {
 
 	return coap.FuncHandler(func(conn *net.UDPConn, addr *net.UDPAddr, msg *coap.Message) *coap.Message {
 		t.logger.Debugf("CoAP Trigger: Recieved request")
 
-		if msg.Code == toCoapCode(method) {
+		uriQuery := msg.Option(coap.URIQuery)
+		var data map[string]interface{}
 
-			uriQuery := msg.Option(coap.URIQuery)
-			var data map[string]interface{}
+		if uriQuery != nil {
+			//todo handle error
+			queryValues, _ := url.ParseQuery(uriQuery.(string))
 
-			if uriQuery != nil {
-				//todo handle error
-				queryValues, _ := url.ParseQuery(uriQuery.(string))
+			queryParams := make(map[string]string, len(queryValues))
 
-				queryParams := make(map[string]string, len(queryValues))
-
-				for key, value := range queryValues {
-					queryParams[key] = strings.Join(value, ",")
-				}
-
-				data = map[string]interface{}{
-					"queryParams": queryParams,
-					"payload":     string(msg.Payload),
-				}
-			} else {
-				data = map[string]interface{}{
-					"payload": string(msg.Payload),
-				}
+			for key, value := range queryValues {
+				queryParams[key] = strings.Join(value, ",")
 			}
 
-			_, err := handler.Handle(context.Background(), data)
-
-			if err != nil {
-				//todo determining if 404 or 500
-				res := &coap.Message{
-					Type:      coap.Reset,
-					Code:      coap.NotFound,
-					MessageID: msg.MessageID,
-					Token:     msg.Token,
-					Payload:   []byte(fmt.Sprintf("Unable to execute handler '%s'", handler)),
-				}
-
-				return res
+			data = map[string]interface{}{
+				"queryParams": queryParams,
+				"payload":     string(msg.Payload),
 			}
-
-			t.logger.Debugf("Ran: %s", handler)
-
-			if msg.IsConfirmable() {
-				res := &coap.Message{
-					Type:      coap.Acknowledgement,
-					Code:      0,
-					MessageID: msg.MessageID,
-					Token:     msg.Token,
-				}
-				//res.SetOption(coap.ContentFormat, coap.TextPlain)
-
-				t.logger.Debugf("Transmitting %#v", res)
-				return res
+		} else {
+			data = map[string]interface{}{
+				"payload": string(msg.Payload),
 			}
-
-			return nil
 		}
+		handler, exists := resource.handlers[msg.Code]
+
+		if !exists {
+			res := &coap.Message{
+				Type:      coap.Reset,
+				Code:      coap.MethodNotAllowed,
+				MessageID: msg.MessageID,
+				Token:     msg.Token,
+			}
+
+			return res
+		}
+
+		_, err := handler.Handle(context.Background(), data)
+
+		if err != nil {
+			//todo determining if 404 or 500
+			res := &coap.Message{
+				Type:      coap.Reset,
+				Code:      coap.NotFound,
+				MessageID: msg.MessageID,
+				Token:     msg.Token,
+				Payload:   []byte(fmt.Sprintf("Unable to execute handler '%s'", handler)),
+			}
+
+			return res
+		}
+
+		t.logger.Debugf("Ran: %s", handler)
+
+		if msg.IsConfirmable() {
+			res := &coap.Message{
+				Type:      coap.Acknowledgement,
+				Code:      0,
+				MessageID: msg.MessageID,
+				Token:     msg.Token,
+			}
+			//res.SetOption(coap.ContentFormat, coap.TextPlain)
+
+			t.logger.Debugf("Transmitting %#v", res)
+			return res
+		}
+
 		return nil
 
 	})
+}
+
+func (t *CoApTrigger) handleDiscovery(conn *net.UDPConn, addr *net.UDPAddr, msg *coap.Message) *coap.Message {
+
+	//todo add filter support
+	if msg.Code == coap.GET {
+		var buffer bytes.Buffer
+
+		numResources := len(t.resources)
+
+		i := 0
+		for _, resource := range t.resources {
+
+			i++
+
+			buffer.WriteString("<")
+			buffer.WriteString(resource.path)
+			buffer.WriteString(">")
+
+			if len(resource.attrs) > 0 {
+				for k, v := range resource.attrs {
+					buffer.WriteString(";")
+					buffer.WriteString(k)
+					buffer.WriteString("=")
+					buffer.WriteString(v)
+				}
+			}
+
+			if i < numResources {
+				buffer.WriteString(",\n")
+			} else {
+				buffer.WriteString("\n")
+			}
+		}
+
+		payloadStr := buffer.String()
+
+		res := &coap.Message{
+			Type:      msg.Type,
+			Code:      coap.Content,
+			MessageID: msg.MessageID,
+			Token:     msg.Token,
+			Payload:   []byte(payloadStr),
+		}
+		res.SetOption(coap.ContentFormat, coap.AppLinkFormat)
+
+		t.logger.Debugf("Transmitting %#v", res)
+
+		return res
+	}
+	return nil
+
 }

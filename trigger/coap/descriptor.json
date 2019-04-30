@@ -10,13 +10,6 @@
         "type": "integer",
         "required": true,
         "description": "The port number"
-      }, 
-      {
-        "name": "method",
-        "type": "string",
-        "required": true,
-        "allowed" : ["GET", "POST", "PUT", "DELETE"],
-        "description": "The CoAP method to listen on"
       }
     ],
     "output": [
@@ -38,7 +31,14 @@
           "type": "string",
           "required" : true,
           "description": "The path of the CoAP request"
-        }
+        },
+        {
+        "name": "method",
+        "type": "string",
+        "required": true,
+        "allowed" : ["GET", "POST", "PUT", "DELETE"],
+        "description": "The CoAP method to listen on"
+      }
       ]
     }
   }

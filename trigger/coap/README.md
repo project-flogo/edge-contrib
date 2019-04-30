@@ -14,12 +14,13 @@ flogo install github.com/project-flogo/edge-contrib/trigger/coap
 | Name      | Type   | Description
 | :---      | :---   | :---
 | port    | string | 	The port number
-| method    | string | 	The Method to listen on
+
 
 ### Handler Settings
 | Name      | Type   | Description
 | :---      | :---   | :---
 | path | string | The path of the CoAP request
+| method    | string | 	The Method to listen on
 
  
 ### Output: 
