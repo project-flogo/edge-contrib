@@ -1,0 +1,44 @@
+{
+    "name": "flogo-coap",
+    "type": "flogo:trigger",
+    "version": "0.0.1",
+    "title": "Receive CoAP Message",
+    "description": "Simple CoAP Trigger",
+    "settings": [
+      {
+        "name": "port",
+        "type": "integer",
+        "required": true,
+        "description": "The port number"
+      }
+    ],
+    "output": [
+      {
+        "name": "queryParams",
+        "type": "params",
+        "description": "The query parameters"
+      },
+      {
+        "name": "payload",
+        "type": "string",
+        "description": "The payload of the CoAP Message"
+      }
+    ],
+    "handler": {
+      "settings": [
+        {
+          "name": "path",
+          "type": "string",
+          "required" : true,
+          "description": "The path of the CoAP request"
+        },
+        {
+          "name": "method",
+          "type": "string",
+          "required": true,
+          "allowed" : ["GET", "POST", "PUT", "DELETE"],
+          "description": "The CoAP method to listen on"
+        }
+      ]
+    }
+  }

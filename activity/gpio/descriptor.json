@@ -1,0 +1,51 @@
+{
+    "name": "flogo-gpio",
+    "type": "flogo:activity",
+    "version": "0.0.1",
+    "title": "Control GPIO",
+    "description": "Control raspberry gpio",
+    "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/activity/gpio",
+    "settings":[
+      {
+        "name": "method",
+        "type": "string",
+        "required": true,
+        "allowed" : ["Direction", "Set State", "Read State", "Pull"],
+        "description": "The method to take action for specified pin (Allowed values are Direction, Set State, Read State, and Pull)"
+      },
+      {
+        "name": "pinNumber",
+        "type": "integer",
+        "required": true,
+        "description": "The pin number of the GPIO"
+      }
+    ],
+    "input":[
+      {
+        "name": "direction",
+        "type": "string",
+        "allowed" : ["Input", "Output"],
+        "description": "Set the direction of the pin (Allowed values are Input and Output)"
+      },
+      {
+        "name": "state",
+        "type": "string",
+        "allowed" : ["High", "Low"],
+        "description": "Set the state of the pin (Allowed values are High and Low)"
+      },
+  
+      {
+        "name": "pull",
+        "type": "string",
+        "allowed" : ["Up", "Down", "Off"],
+        "description": "Pull the pin to the specified value (Allowed values are Up, Down, and Off)"
+      }
+    ],
+    "output": [
+      {
+        "name": "result",
+        "type": "int",
+        "description": "The result of the operation"
+      }
+    ]
+}
