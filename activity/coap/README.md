@@ -1,5 +1,5 @@
 # CoAp
-This activity allows you to Get, Insert, Update and Delete a document in couchbase database.
+This activity allows you to send a CoAP message.
 
 ## Installation
 
@@ -13,18 +13,18 @@ flogo install github.com/project-flogo/edge-contrib/activity/coap
 ### Settings:
 | Name    | Type   | Description
 | :---    | :---   | :---
-| method  | string | The CoAP method to use    
-| uri     | string | The URI of the service to invoke  
-| type    | string | The type of the service    
-| options | string | The options to set     
+| method  | string | The CoAP method to use (Allowed values are GET, POST, PUT, DELETE)  - ***REQUIRED***   
+| uri     | string | The URI of the service to invoke - ***REQUIRED***
+| type    | string | The message type (Allowed values are Confirmable, NonConfirmable, Acknowledgement, Reset),  *Confirmable* is the default 
+| options | string | The CoAP options to set     
 
 ### Input: 
 
 | Name       | Type   | Description
 | :---       | :---   | :---
 | queryParams| string | The query params of the CoAP Message    
-| messageId  | string | The message Id
 | payload    | string | The payload of the CoAP Message   
+| messageId  | string | The message Id, if not assigned, one will be randomly generated
  
 
 ### Output:

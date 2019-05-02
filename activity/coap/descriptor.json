@@ -19,11 +19,12 @@
         "allowed" : ["GET", "POST", "PUT", "DELETE"],
         "description": "The CoAP method to use"
       },
-      
       {
-        "name": "type",
+        "name": "messageType",
         "type": "string",
-        "description": "The type of the service"
+        "value": "Confirmable",
+        "allowed" : ["Confirmable", "NonConfirmable", "Acknowledgement", "Reset"],
+        "description": "The type of the message"
       },
       {
         "name": "options",

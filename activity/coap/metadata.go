@@ -5,10 +5,10 @@ import (
 )
 
 type Settings struct {
-	Method  string            `md:"method,required"`
-	URI     string            `md:"uri,required"`
-	Type    string            `md:"type"`
-	Options map[string]string `md:"options"`
+	Method      string            `md:"method,required"`
+	URI         string            `md:"uri,required"`
+	MessageType string            `md:"messageType"`
+	Options     map[string]string `md:"options"`
 }
 
 type Input struct {
@@ -36,16 +36,13 @@ func (i *Input) FromMap(values map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-
 	i.Payload, err = coerce.ToString(values["payload"])
 	if err != nil {
 		return err
 	}
 	i.MessageId, err = coerce.ToInt(values["messageId"])
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 
 func (o *Output) ToMap() map[string]interface{} {
