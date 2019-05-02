@@ -23,13 +23,13 @@ const testConfig string = `{
 	"ref": "github.com/project-flogo/device-contrib/trigger/coap",
 	"handlers": [
 	  {
-		"settings": {
-		  "path": "/flogo"
-		},
-		"action" : {
-		  "id": "dummy"
+			"settings": {
+		  	"path": "/flogo"
+			},
+			"action" : {
+		  	"id": "dummy"
+			}
 		}
-	  }
 	]
   }`
 

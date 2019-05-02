@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/url"
+	"strings"
 
 	"github.com/dustin/go-coap"
 	"github.com/project-flogo/core/activity"
@@ -38,7 +39,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 
 	req := coap.Message{
 		Type: toCoapType(s.Type),
-		Code: toCoapCode(s.Method),
+		Code: toCoapCode(strings.ToUpper(s.Method)),
 	}
 
 	coapURI, err := url.Parse(s.URI)

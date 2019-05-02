@@ -23,7 +23,7 @@ flogo install github.com/project-flogo/edge-contrib/trigger/mqtt
 | Name      | Type   | Description
 | :---      | :---   | :---
 | cleansess | string | Clean sesssion
-| topic | string | The topic to publish to
+| topic | string | The topic to listen on
 | qos | string | The quality of service
 
  

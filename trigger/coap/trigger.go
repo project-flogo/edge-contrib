@@ -71,7 +71,7 @@ func (t *CoApTrigger) Initialize(ctx trigger.InitContext) error {
 		}
 
 		path := s.Path
-		method := s.Method
+		method := strings.ToUpper(s.Method)
 
 		t.logger.Debugf("Registering handler [%s]", path)
 		resource, exists := t.resources[path]
@@ -79,11 +79,14 @@ func (t *CoApTrigger) Initialize(ctx trigger.InitContext) error {
 		if !exists {
 			resource = &CoapResource{path: path, attrs: make(map[string]string), handlers: make(map[coap.COAPCode]trigger.Handler)}
 			t.resources[path] = resource
+
+			t.logger.Debugf("Registering handler for [%s-%s]", method, path)
+			mux.Handle(path, newActionHandler(t, resource))
 		}
 
 		resource.handlers[toCoapCode(method)] = handler
 
-		mux.Handle(path, newActionHandler(t, resource))
+		t.logger.Debugf("Registering handler for [%s-%s]", method, path)
 	}
 	t.server = NewServer("udp", t.settings.Port, mux)
 
