@@ -13,25 +13,25 @@ flogo install github.com/project-flogo/edge-contrib/activity/coap
 ### Settings:
 | Name    | Type   | Description
 | :---    | :---   | :---
-| method  | string | The CoAP method to use (Allowed values are GET, POST, PUT, DELETE)  - ***REQUIRED***   
-| uri     | string | The URI of the service to invoke - ***REQUIRED***
-| type    | string | The message type (Allowed values are Confirmable, NonConfirmable, Acknowledgement, Reset),  *Confirmable* is the default 
+| method  | string | The CoAP method to use (allowed values are GET, POST, PUT, DELETE)  - ***REQUIRED***   
+| uri     | string | The CoAP resource URI - ***REQUIRED***
+| type    | string | The message type (allowed values are Confirmable, NonConfirmable, Acknowledgement, Reset),  *Confirmable* is the default 
 | options | string | The CoAP options to set     
 
 ### Input: 
 
 | Name       | Type   | Description
 | :---       | :---   | :---
-| queryParams| string | The query params of the CoAP Message    
-| payload    | string | The payload of the CoAP Message   
-| messageId  | string | The message Id, if not assigned, one will be randomly generated
+| queryParams| string | The query params of the CoAP message    
+| payload    | string | The payload of the CoAP message   
+| messageId  | int    | ID used to detect duplicates and for optional reliability
  
 
 ### Output:
 
 | Name       | Type   | Description
 | :---       | :---   | :---
-| response   | string | The response from the service"
+| response   | string | The response
 
 ## Example
 

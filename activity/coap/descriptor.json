@@ -10,7 +10,7 @@
         "name": "uri",
         "type": "string",
         "required": true,
-        "description": "The URI of the service to invoke"
+        "description": "The CoAP resource URI"
       },
       {
         "name": "method",
@@ -24,12 +24,12 @@
         "type": "string",
         "value": "Confirmable",
         "allowed" : ["Confirmable", "NonConfirmable", "Acknowledgement", "Reset"],
-        "description": "The type of the message"
+        "description": "The message type"
       },
       {
         "name": "options",
         "type": "params",
-        "description": "The options to set"
+        "description": "The CoAP options to set"
       }
       
     ],
@@ -46,16 +46,15 @@
       },
       {
         "name": "messageId",
-        "type": "integer",
-        "description": "The message id"
+        "type": "int",
+        "description": "ID used to detect duplicates and for optional reliability"
       }
     ],
-
     "output": [
       {
         "name": "response",
         "type": "string",
-        "description": "The response from the service"
+        "description": "The response"
       }
     ]
   }

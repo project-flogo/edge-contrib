@@ -5,20 +5,20 @@ import (
 )
 
 type Settings struct {
-	Method      string            `md:"method,required"`
-	URI         string            `md:"uri,required"`
-	MessageType string            `md:"messageType"`
-	Options     map[string]string `md:"options"`
+	Method      string            `md:"method,required"` // The CoAP method to use
+	URI         string            `md:"uri,required"`    // The CoAP resource URI
+	MessageType string            `md:"messageType"`     // The message type
+	Options     map[string]string `md:"options"`         // The CoAP options to set
 }
 
 type Input struct {
-	QueryParams map[string]string `md:"queryParams"`
-	MessageId   int               `md:"messageId"`
-	Payload     string            `md:"payload"`
+	QueryParams map[string]string `md:"queryParams"` // The query params of the CoAP message
+	MessageId   int               `md:"messageId"`   // ID used to detect duplicates and for optional reliability
+	Payload     string            `md:"payload"`     // The payload of the CoAP message
 }
 
 type Output struct {
-	Response string `md:"response"`
+	Response string `md:"response"` // The response
 }
 
 func (i *Input) ToMap() map[string]interface{} {
