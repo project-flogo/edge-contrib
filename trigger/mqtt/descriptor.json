@@ -37,6 +37,21 @@
         "name": "cleansess",
         "type": "boolean",
         "description": "Clean sesssion"
+      },
+      {
+        "name": "enableTLS",
+        "type": "boolean",
+        "description": "Enable TLS"
+      },
+      {
+        "name": "autoreconnect",
+        "type": "boolean",
+        "description": "Enable Autoreconnect"
+      },
+      {
+        "name": "keepalive",
+        "type": "int",
+        "description": "Keep Alive"
       }
     ],
     "output": [
@@ -64,7 +79,7 @@
           "name": "qos",
           "type": "double",
           "description": "The Quality of Service"
-        },
+        }
       ]
     }
   }
