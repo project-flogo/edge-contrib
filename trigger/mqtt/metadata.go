@@ -5,12 +5,16 @@ import (
 )
 
 type Settings struct {
-	Broker    string `md:"broker"`
-	Id        string `md:"id"`
-	User      string `md:"user"`
-	Password  string `md:"password"`
-	Store     string `md:"store"`
-	Cleansess bool   `md:"cleansess"`
+	Broker        string `md:"broker"`
+	Id            string `md:"id"`
+	User          string `md:"user"`
+	Password      string `md:"password"`
+	Store         string `md:"store"`
+	CertStore     string `md:"certStore"`
+	Cleansess     bool   `md:"cleansess"`
+	KeepAlive     int    `md:"keepalive"`
+	AutoReconnect bool   `md:"autoreconnect"`
+	EnableTLS     bool   `md:"enableTLS"`
 }
 
 type HandlerSettings struct {

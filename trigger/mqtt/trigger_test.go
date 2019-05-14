@@ -15,15 +15,21 @@ const testConfig string = `{
 	"id": "trigger-mqtt",
 	"ref": "github.com/project-flogo/device-contrib/trigger/mqtt",
 	"settings": {
-		"broker": "tcp://localhost:1883",
-		"qos": "0",
-		"cleansess": "false",
-		"id":"client-1"
+		"autoreconnect": true,
+        "broker": "ssl://mqtt.bosch-iot-hub.com:8883",
+        "certstore": "*****8",
+        "cleansess": false,
+        "enableTLS": true,
+				"id": "FlogoTest237123",
+        "keepalive": 30,
+        "password": "****",
+        "store": ":memory:",
+        "user": "*****"
     },
 	"handlers": [
 	  {
 		"settings": {
-		  "topic": "flogo"
+			"topic": "control/+/+/req/#"
 		},
 		"action" : {
 		  "id": "dummy"
@@ -55,8 +61,8 @@ func TestRestTrigger_Initialize(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, trg)
 	err = trg.Start()
+	
 	for {
 
 	}
-
 }

@@ -2,10 +2,13 @@ package mqtt
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
+	"io/ioutil"
 	"time"
 
-	"github.com/eclipse/paho.mqtt.golang"
+	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/project-flogo/core/data/coerce"
 	"github.com/project-flogo/core/data/metadata"
 	"github.com/project-flogo/core/support/log"
@@ -59,11 +62,12 @@ func (t *MqttTrigger) Initialize(ctx trigger.InitContext) error {
 		if err != nil {
 			return err
 		}
-		options.SetClientID(t.settings.Id)
+
 		options.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
 			topic := msg.Topic()
 			qos := msg.Qos()
 			payload := string(msg.Payload())
+			t.logger.Info("Payload Recieved..", payload)
 			reply := &Reply{}
 			result, err := runHandler(handler, payload)
 
@@ -88,8 +92,8 @@ func (t *MqttTrigger) Initialize(ctx trigger.InitContext) error {
 
 		})
 
-		options.SetKeepAlive(2 * time.Second)
 		//Creating new client for each handler because each client struct expects one publish handler
+		t.logger.Debug("Client options..", options)
 		client := mqtt.NewClient(options)
 
 		if token := client.Connect(); token.Wait() && token.Error() != nil {
@@ -117,6 +121,20 @@ func initClientOption(settings *Settings) *mqtt.ClientOptions {
 	if storeType := settings.Store; storeType != ":memory:" {
 		opts.SetStore(mqtt.NewFileStore(settings.Store))
 	}
+	if settings.KeepAlive != 0 {
+		opts.SetKeepAlive(time.Duration(settings.KeepAlive) * time.Second)
+	}
+	opts.SetAutoReconnect(settings.AutoReconnect)
+
+	opts.SetKeepAlive(2 * time.Second)
+
+	if settings.EnableTLS {
+		// if thing is not set, this indicates that this is not AWS IoT
+
+		tlsConfig := NewTLSConfig(settings.CertStore)
+		opts.SetTLSConfig(tlsConfig)
+
+	}
 	return opts
 }
 
@@ -128,9 +146,10 @@ func (t *MqttTrigger) Start() error {
 		if token := handler.client.Subscribe(handler.topic, byte(handler.qos), nil); token.Wait() && token.Error() != nil {
 			t.logger.Errorf("Error subscribing to topic %s: %s", handler.topic, token.Error())
 			return token.Error()
-		} else {
-			t.logger.Debugf("Subscribed to topic: %s", handler.topic)
 		}
+
+		t.logger.Debugf("Subscribed to topic: %s", handler.topic)
+
 	}
 
 	return nil
@@ -164,4 +183,21 @@ func runHandler(handler trigger.Handler, payload string) (map[string]interface{}
 	}
 
 	return results, nil
+}
+
+func NewTLSConfig(certstore string) *tls.Config {
+
+	// Import root CA
+	certpool := x509.NewCertPool()
+	pemCerts, err := ioutil.ReadFile(certstore)
+	if err == nil {
+		certpool.AppendCertsFromPEM(pemCerts)
+	}
+
+	return &tls.Config{
+		RootCAs:            certpool,
+		ClientAuth:         tls.NoClientCert,
+		ClientCAs:          nil,
+		InsecureSkipVerify: true,
+	}
 }
