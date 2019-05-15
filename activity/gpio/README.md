@@ -1,3 +1,7 @@
+<!--
+title: GPIO
+weight: 4611
+-->
 # GPIO
 This activity allows you to control GPIO pins on a Raspberry Pi.
 

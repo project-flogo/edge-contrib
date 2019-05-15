@@ -1,7 +1,7 @@
 {
     "name": "flogo-coap",
     "type": "flogo:activity",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "title": "Send CoAP Message",
     "description": "Simple CoAP Activity",
     "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/activity/coap",

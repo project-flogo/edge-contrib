@@ -1,3 +1,8 @@
+<!--
+title: CoAP
+weight: 4607
+-->
+
 # CoAp
 This activity allows you to send a CoAP message.
 

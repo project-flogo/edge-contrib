@@ -1,5 +1,5 @@
 # MQTT
-This activity allows you to send message on Mqtt Queue.
+This activity allows you to send message on MQTT Queue.
 
 ## Installation
 
@@ -11,21 +11,33 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
 ## Configuration
 
 ### Settings:
-| Name      | Type   | Description
-| :---      | :---   | :---
-| broker    | string | 	The broker URL
-| id | string | The id of client 
-| user | string | The name of the user
-| password | string | The password of the user
-| store | string | The path containing certificates
-| cleansess | string | Clean sesssion
-| topic | string | The topic to publish to
-| qos | string | The quality of service
+| Name         | Type   | Description
+| :---         | :---   | :---
+| broker       | string | The broker URL - ***REQUIRED***
+| id           | string | The id of client - ***REQUIRED***
+| username     | string | The name of the user
+| password     | string | The password of the user
+| store        | string | The store for message persistence
+| cleanSession | bool   | Clean session flag
+| topic        | string | The topic to publish to - ***REQUIRED***
+| qos          | int    | The quality of service
+| sslConfig    | object | SSL configuration
+ 
+ #### *sslConfig* Object: 
+ | Property      | Type   | Description
+ |:---           | :---   | :---     
+ | skipVerify    | bool   | Skip SSL validation, defaults to true
+ | useSystemCert | bool   | Use the systems root certificate file, defaults to true
+ | caFile        | string | The path to PEM encoded root certificates file
+ | certFile      | string | The path to PEM encoded client certificate
+ | keyFile       | string | The path to PEM encoded client key
+ 
+ *Note: used if broker URI is ssl*
  
 ### Input: 
 
-| Name       | Type   | Description
-| :---       | :---   | :---
+| Name    | Type   | Description
+| :---    | :---   | :---
 | message | string | The message to send  
     
 ### Output:
@@ -39,8 +51,8 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
 ```json
 {
   "id": "mqtt-activity",
-  "name": "Mqtt Activity",
-  "description": "Mqtt Example",
+  "name": "MQTT Activity",
+  "description": "MQTT Example",
   "activity": {
     "ref": "github.com/project-flogo/edge-contrib/activity/mqtt",
     "settings": {

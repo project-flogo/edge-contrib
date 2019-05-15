@@ -1,7 +1,7 @@
 {
     "name": "flogo-gpio",
     "type": "flogo:activity",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "title": "Control GPIO",
     "description": "Control raspberry gpio",
     "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/activity/gpio",
