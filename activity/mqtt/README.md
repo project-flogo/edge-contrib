@@ -1,3 +1,7 @@
+<!--
+title: MQTT
+weight: 4705
+-->
 # MQTT
 This activity allows you to send message on MQTT Queue.
 

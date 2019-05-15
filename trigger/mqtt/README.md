@@ -1,5 +1,9 @@
+<!--
+title: MQTT
+weight: 4705
+-->
 # MQTT
-This activity allows you to listen to messages on MQTT Queue.
+This trigger allows you to listen to messages on MQTT.
 
 ## Installation
 

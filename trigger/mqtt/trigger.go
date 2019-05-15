@@ -133,6 +133,8 @@ func (t *MqttTrigger) Initialize(ctx trigger.InitContext) error {
 
 	t.logger.Debugf("Client options: %v", options)
 
+	t.handlers = make(map[string]*clientHandler)
+
 	for _, handler := range ctx.GetHandlers() {
 
 		s := &HandlerSettings{}
