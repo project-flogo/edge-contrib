@@ -12,7 +12,7 @@ import (
 var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
 
 func init() {
-	_ = activity.Register(&MqttActivity{}, New)
+	_ = activity.Register(&Activity{}, New)
 }
 
 func New(ctx activity.InitContext) (activity.Activity, error) {
@@ -60,20 +60,20 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, token.Error()
 	}
 
-	act := &MqttActivity{client: mqttClient}
+	act := &Activity{client: mqttClient}
 	return act, nil
 }
 
-type MqttActivity struct {
+type Activity struct {
 	settings *Settings
 	client   mqtt.Client
 }
 
-func (a *MqttActivity) Metadata() *activity.Metadata {
+func (a *Activity) Metadata() *activity.Metadata {
 	return activityMd
 }
 
-func (a *MqttActivity) Eval(ctx activity.Context) (done bool, err error) {
+func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 
 	input := &Input{}
 

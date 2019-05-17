@@ -16,11 +16,11 @@ import (
 var triggerMd = trigger.NewMetadata(&Settings{}, &HandlerSettings{}, &Output{})
 
 func init() {
-	_ = trigger.Register(&MqttTrigger{}, &Factory{})
+	_ = trigger.Register(&Trigger{}, &Factory{})
 }
 
-// MqttTrigger is simple MQTT trigger
-type MqttTrigger struct {
+// Trigger is simple MQTT trigger
+type Trigger struct {
 	handlers map[string]*clientHandler
 	settings *Settings
 	logger   log.Logger
@@ -48,11 +48,11 @@ func (*Factory) New(config *trigger.Config) (trigger.Trigger, error) {
 		return nil, err
 	}
 
-	return &MqttTrigger{settings: s}, nil
+	return &Trigger{settings: s}, nil
 }
 
 // Initialize implements trigger.Initializable.Initialize
-func (t *MqttTrigger) Initialize(ctx trigger.InitContext) error {
+func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 	t.logger = ctx.Logger()
 
 	settings := t.settings
@@ -173,7 +173,7 @@ func initClientOption(settings *Settings) *mqtt.ClientOptions {
 }
 
 // Start implements trigger.Trigger.Start
-func (t *MqttTrigger) Start() error {
+func (t *Trigger) Start() error {
 
 	client := mqtt.NewClient(t.options)
 
@@ -197,7 +197,7 @@ func (t *MqttTrigger) Start() error {
 }
 
 // Stop implements ext.Trigger.Stop
-func (t *MqttTrigger) Stop() error {
+func (t *Trigger) Stop() error {
 
 	//unsubscribe from topics
 	for _, handler := range t.handlers {

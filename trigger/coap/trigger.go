@@ -17,7 +17,7 @@ import (
 var triggerMd = trigger.NewMetadata(&Settings{}, &HandlerSettings{}, &Output{})
 
 func init() {
-	_ = trigger.Register(&CoApTrigger{}, &Factory{})
+	_ = trigger.Register(&Trigger{}, &Factory{})
 }
 
 type Factory struct {
@@ -36,11 +36,11 @@ func (*Factory) New(config *trigger.Config) (trigger.Trigger, error) {
 		return nil, err
 	}
 
-	return &CoApTrigger{id: config.Id, settings: s}, nil
+	return &Trigger{id: config.Id, settings: s}, nil
 }
 
 // Trigger CoAp trigger struct
-type CoApTrigger struct {
+type Trigger struct {
 	server    *Server
 	settings  *Settings
 	resources map[string]*CoapResource
@@ -53,7 +53,7 @@ type CoapResource struct {
 	handlers map[coap.COAPCode]trigger.Handler
 }
 
-func (t *CoApTrigger) Initialize(ctx trigger.InitContext) error {
+func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 
 	t.logger = ctx.Logger()
 
@@ -93,16 +93,16 @@ func (t *CoApTrigger) Initialize(ctx trigger.InitContext) error {
 	return nil
 }
 
-func (t *CoApTrigger) Start() error {
+func (t *Trigger) Start() error {
 	return t.server.Start()
 }
 
 // Stop implements util.Managed.Stop
-func (t *CoApTrigger) Stop() error {
+func (t *Trigger) Stop() error {
 	return t.server.Stop()
 }
 
-func newActionHandler(t *CoApTrigger, resource *CoapResource) coap.Handler {
+func newActionHandler(t *Trigger, resource *CoapResource) coap.Handler {
 
 	return coap.FuncHandler(func(conn *net.UDPConn, addr *net.UDPAddr, msg *coap.Message) *coap.Message {
 		t.logger.Debugf("CoAP Trigger: Recieved request")
@@ -177,7 +177,7 @@ func newActionHandler(t *CoApTrigger, resource *CoapResource) coap.Handler {
 	})
 }
 
-func (t *CoApTrigger) handleDiscovery(conn *net.UDPConn, addr *net.UDPAddr, msg *coap.Message) *coap.Message {
+func (t *Trigger) handleDiscovery(conn *net.UDPConn, addr *net.UDPAddr, msg *coap.Message) *coap.Message {
 
 	//todo add filter support
 	if msg.Code == coap.GET {
