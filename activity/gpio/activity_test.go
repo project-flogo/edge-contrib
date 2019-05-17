@@ -9,7 +9,7 @@ import (
 
 func TestRegister(t *testing.T) {
 
-	ref := activity.GetRef(&GPIOActivity{})
+	ref := activity.GetRef(&Activity{})
 	act := activity.Get(ref)
 
 	assert.NotNil(t, act)

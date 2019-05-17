@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	_ = activity.Register(&CoAPActivity{}, New)
+	_ = activity.Register(&Activity{}, New)
 }
 
 var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
@@ -41,13 +41,13 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		msgType = toCoapMsgType(s.MessageType)
 	}
 
-	return &CoAPActivity{settings: s, msgType: msgType, methodCode: toCoapMethodCode(s.Method), coapURI: coapURI}, nil
+	return &Activity{settings: s, msgType: msgType, methodCode: toCoapMethodCode(s.Method), coapURI: coapURI}, nil
 }
 
-// CoAPActivity is an Activity that is used to send a CoAP message
+// Activity is an Activity that is used to send a CoAP message
 // inputs : {method,type,payload,messageId}
 // outputs: {result}
-type CoAPActivity struct {
+type Activity struct {
 	settings *Settings
 
 	coapURI    *url.URL
@@ -55,14 +55,14 @@ type CoAPActivity struct {
 	methodCode coap.COAPCode
 }
 
-func (act *CoAPActivity) Metadata() *activity.Metadata {
+func (act *Activity) Metadata() *activity.Metadata {
 	return activityMd
 }
 
 //todo enhance CoAP client code
 
 // Eval implements api.Activity.Eval - Invokes a REST Operation
-func (act *CoAPActivity) Eval(ctx activity.Context) (done bool, err error) {
+func (act *Activity) Eval(ctx activity.Context) (done bool, err error) {
 
 	log := ctx.Logger()
 	input := &Input{}
