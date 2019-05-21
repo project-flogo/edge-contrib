@@ -60,7 +60,7 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, token.Error()
 	}
 
-	act := &Activity{client: mqttClient}
+	act := &Activity{client: mqttClient, settings: settings}
 	return act, nil
 }
 
