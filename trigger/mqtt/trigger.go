@@ -90,45 +90,7 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 	}
 
 	options.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-		topic := msg.Topic()
-		qos := msg.Qos()
-		payload := string(msg.Payload())
-
-		handler, ok := t.handlers[topic]
-		if !ok {
-			t.logger.Warnf("Recieved message on unhandled topic: %s", topic)
-			return
-		}
-
-		t.logger.Debugf("Topic[%s] - Payload Recieved: %s", topic, payload)
-
-		result, err := runHandler(handler.handler, payload)
-		if err != nil {
-			t.logger.Error("Error handling message: %v", err)
-			return
-		}
-
-		if handler.settings.ReplyTopic != "" {
-			reply := &Reply{}
-			err = reply.FromMap(result)
-			if err != nil {
-				t.logger.Error("Error handling message: %v", err)
-				return
-			}
-
-			if reply.Data != nil {
-				dataJson, err := json.Marshal(reply.Data)
-				if err != nil {
-					return
-				}
-				token := client.Publish(handler.settings.ReplyTopic, qos, false, string(dataJson))
-				sent := token.WaitTimeout(5000 * time.Millisecond)
-				if !sent {
-					t.logger.Errorf("Timeout occurred while trying to publish reply to topic '%s'", handler.settings.ReplyTopic)
-					return
-				}
-			}
-		}
+		t.logger.Warnf("Recieved message on unhandled topic: %s", msg.Topic())
 	})
 
 	t.logger.Debugf("Client options: %v", options)
@@ -185,7 +147,7 @@ func (t *Trigger) Start() error {
 
 	for _, handler := range t.handlers {
 
-		if token := client.Subscribe(handler.settings.Topic, byte(handler.settings.Qos), nil); token.Wait() && token.Error() != nil {
+		if token := client.Subscribe(handler.settings.Topic, byte(handler.settings.Qos), t.getHanlder(handler)); token.Wait() && token.Error() != nil {
 			t.logger.Errorf("Error subscribing to topic %s: %s", handler.settings.Topic, token.Error())
 			return token.Error()
 		}
@@ -210,6 +172,44 @@ func (t *Trigger) Stop() error {
 	t.client.Disconnect(250)
 
 	return nil
+}
+
+func (t *Trigger) getHanlder(handler *clientHandler) func(mqtt.Client, mqtt.Message) {
+	return func(client mqtt.Client, msg mqtt.Message) {
+		topic := msg.Topic()
+		qos := msg.Qos()
+		payload := string(msg.Payload())
+
+		t.logger.Debugf("Topic[%s] - Payload Recieved: %s", topic, payload)
+
+		result, err := runHandler(handler.handler, payload)
+		if err != nil {
+			t.logger.Error("Error handling message: %v", err)
+			return
+		}
+
+		if handler.settings.ReplyTopic != "" {
+			reply := &Reply{}
+			err = reply.FromMap(result)
+			if err != nil {
+				t.logger.Error("Error handling message: %v", err)
+				return
+			}
+
+			if reply.Data != nil {
+				dataJson, err := json.Marshal(reply.Data)
+				if err != nil {
+					return
+				}
+				token := client.Publish(handler.settings.ReplyTopic, qos, false, string(dataJson))
+				sent := token.WaitTimeout(5000 * time.Millisecond)
+				if !sent {
+					t.logger.Errorf("Timeout occurred while trying to publish reply to topic '%s'", handler.settings.ReplyTopic)
+					return
+				}
+			}
+		}
+	}
 }
 
 // RunHandler runs the handler and associated action
