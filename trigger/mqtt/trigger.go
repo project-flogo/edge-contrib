@@ -57,6 +57,7 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 
 	settings := t.settings
 	options := initClientOption(settings)
+	t.options = options
 
 	if strings.HasPrefix(settings.Broker, "ssl") {
 
@@ -89,7 +90,6 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 	}
 
 	options.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-
 		topic := msg.Topic()
 		qos := msg.Qos()
 		payload := string(msg.Payload())
