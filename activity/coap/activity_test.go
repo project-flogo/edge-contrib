@@ -10,7 +10,7 @@ import (
 
 func TestRegister(t *testing.T) {
 
-	ref := activity.GetRef(&CoAPActivity{})
+	ref := activity.GetRef(&Activity{})
 	act := activity.Get(ref)
 
 	assert.NotNil(t, act)

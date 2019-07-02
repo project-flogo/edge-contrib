@@ -1,7 +1,7 @@
 {
     "name": "flogo-coap",
     "type": "flogo:activity",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "title": "Send CoAP Message",
     "description": "Simple CoAP Activity",
     "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/activity/coap",
@@ -10,7 +10,7 @@
         "name": "uri",
         "type": "string",
         "required": true,
-        "description": "The URI of the service to invoke"
+        "description": "The CoAP resource URI"
       },
       {
         "name": "method",
@@ -19,16 +19,17 @@
         "allowed" : ["GET", "POST", "PUT", "DELETE"],
         "description": "The CoAP method to use"
       },
-      
       {
-        "name": "type",
+        "name": "messageType",
         "type": "string",
-        "description": "The type of the service"
+        "value": "Confirmable",
+        "allowed" : ["Confirmable", "NonConfirmable", "Acknowledgement", "Reset"],
+        "description": "The message type"
       },
       {
         "name": "options",
         "type": "params",
-        "description": "The options to set"
+        "description": "The CoAP options to set"
       }
       
     ],
@@ -45,16 +46,15 @@
       },
       {
         "name": "messageId",
-        "type": "integer",
-        "description": "The message id"
+        "type": "int",
+        "description": "ID used to detect duplicates and for optional reliability"
       }
     ],
-
     "output": [
       {
         "name": "response",
         "type": "string",
-        "description": "The response from the service"
+        "description": "The response"
       }
     ]
   }

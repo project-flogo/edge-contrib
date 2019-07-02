@@ -40,7 +40,7 @@ const testConfig string = `{
 
 func TestTrigger_Register(t *testing.T) {
 
-	ref := support.GetRef(&MqttTrigger{})
+	ref := support.GetRef(&Trigger{})
 	f := trigger.GetFactory(ref)
 	assert.NotNil(t, f)
 }

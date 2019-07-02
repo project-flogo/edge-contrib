@@ -1,7 +1,9 @@
 package coap
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/dustin/go-coap"
 )
@@ -18,11 +20,11 @@ const (
 	typeRST = "RESET"
 )
 
-func toCoapCode(method string) coap.COAPCode {
+func toCoapMethodCode(method string) coap.COAPCode  {
 
 	var code coap.COAPCode
 
-	switch method {
+	switch strings.ToUpper(method) {
 	case methodGET:
 		code = coap.GET
 	case methodPOST:
@@ -36,11 +38,11 @@ func toCoapCode(method string) coap.COAPCode {
 	return code
 }
 
-func toCoapType(typeStr string) coap.COAPType {
+func toCoapMsgType(msgType string) coap.COAPType {
 
 	var ctype coap.COAPType
 
-	switch typeStr {
+	switch strings.ToUpper(msgType) {
 	case typeCON:
 		ctype = coap.Confirmable
 	case typeNON:
@@ -61,7 +63,7 @@ func toOption(name string, value string) (coap.OptionID, interface{}) {
 
 	val = value
 
-	switch name {
+	switch strings.ToUpper(name) {
 	case "IFMATCH":
 		opID = coap.IfMatch
 	case "URIHOST":

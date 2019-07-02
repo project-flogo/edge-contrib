@@ -33,14 +33,14 @@ const (
 )
 
 func init() {
-	_ = activity.Register(&GPIOActivity{}, New)
+	_ = activity.Register(&Activity{}, New)
 }
 
-type GPIOActivity struct {
+type Activity struct {
 	settings *Settings
 }
 
-var GPIOActivitymd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
+var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
 
 func New(ctx activity.InitContext) (activity.Activity, error) {
 	s := &Settings{}
@@ -51,15 +51,15 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, err
 	}
 
-	return &GPIOActivity{settings: s}, nil
+	return &Activity{settings: s}, nil
 }
 
-func (a *GPIOActivity) Metadata() *activity.Metadata {
-	return GPIOActivitymd
+func (a *Activity) Metadata() *activity.Metadata {
+	return activityMd
 }
 
 // Eval implements api.Activity.Eval - Invokes a REST Operation
-func (a *GPIOActivity) Eval(ctx activity.Context) (done bool, err error) {
+func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 
 	log := ctx.Logger()
 	//getmethod

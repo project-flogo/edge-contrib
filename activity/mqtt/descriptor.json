@@ -1,66 +1,101 @@
 {
-    "name": "flogo-mqtt",
-    "type": "flogo:activity",
-    "version": "0.0.1",
-    "title": "MQTT Activity",
-    "description": "Send MQTT message",
-    "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/activity/mqtt",
-    "settings":[
+  "name": "flogo-mqtt",
+  "type": "flogo:activity",
+  "version": "0.1.0",
+  "title": "MQTT Activity",
+  "description": "Send MQTT message",
+  "homepage": "https://github.com/project-flogo/edge-contrib/tree/master/activity/mqtt",
+  "settings": [
+    {
+      "name": "broker",
+      "type": "string",
+      "required": true,
+      "description": "The broker URL"
+    },
+    {
+      "name": "id",
+      "type": "string",
+      "required": true,
+      "description": "The id of client"
+    },
+    {
+      "name": "username",
+      "type": "string",
+      "description": "The user's name"
+    },
+    {
+      "name": "password",
+      "type": "string",
+      "description": "The user's password"
+    },
+    {
+      "name": "store",
+      "type": "string",
+      "description": "The store for message persistence"
+    },
+    {
+      "name": "qos",
+      "type": "int",
+      "allowed": [0,1,2],
+      "description": "The quality of service"
+    },
+    {
+      "name": "cleanSession",
+      "type": "boolean",
+      "description": "Clean session flag"
+    },
+    {
+      "name": "topic",
+      "type": "string",
+      "description": "The topic to publish to"
+    },
+    {
+      "name": "sslConfig",
+      "type": "object",
+      "description": "Optional SSL Settings",
+      "properties": [
         {
-          "name": "broker",
-          "type": "string",
-          "required": true,
-          "description": "The broker URL"
-        },
-        {
-          "name": "id",
-          "type": "string",
-          "required": true,
-          "description": "The id of client"
-        },
-        {
-          "name": "user",
-          "type": "string",
-          "description": "The name of the user"
-        },
-        {
-          "name": "password",
-          "type": "string",
-          "description": "The password of the user"
-        },
-        {
-          "name": "store",
-          "type": "string",
-          "description": "The path containing certificates"
-        },
-        {
-          "name": "qos",
-          "type": "double",
-          "description": "The quality of service"
-        },
-        {
-          "name": "cleansess",
+          "name": "skipVerify",
           "type": "boolean",
-          "description": "Clean sesssion "
+          "value": "true",
+          "description": "Skip SSL validation"
         },
         {
-          "name": "topic",
-          "type": "string",
-          "description": "The topic to publish to "
-        }
-      ],
-    "input": [
+          "name": "useSystemCert",
+          "type": "boolean",
+          "value": "true",
+          "description": "Use the systems root certificate file"
+        },
         {
-          "name": "message",
+          "name": "certFile",
           "type": "string",
-          "description": "The message to send"
-        }
-      ],
-    "output": [
+          "description": "Path to PEM encoded client certificate"
+        },
         {
-          "name": "data",
-          "type": "object",
-          "description": "The data recieved"
+          "name": "keyFile",
+          "type": "string",
+          "description": "Path to PEM encoded client key"
+        },
+        {
+          "name": "caFile",
+          "type": "string",
+          "description": "Path to PEM encoded root certificates file"
         }
-    ]
+      ]
+    }
+  ],
+  "input": [
+    {
+      "name": "message",
+      "type": "string",
+      "description": "The message to send"
+    }
+  ],
+  "output": [
+    {
+      "name": "data",
+      "type": "object",
+      "description": "The data recieved"
+    }
+  ]
 }
