@@ -24,6 +24,7 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
 | store        | string | The store for message persistence
 | cleanSession | bool   | Clean session flag
 | topic        | string | The topic to publish to - ***REQUIRED***
+| retain       | bool   | Retain the Topic/Message - ***REQUIRED***
 | qos          | int    | The quality of service
 | sslConfig    | object | SSL configuration
  

@@ -44,6 +44,7 @@ flogo install github.com/project-flogo/edge-contrib/trigger/mqtt
 | topic      | string | The topic to listen on - ***REQUIRED***
 | replyTopic | string | The topic to reply on   
 | qos        | int    | The Quality of Service
+| retain     | bool   | Retain Topic/Message
 
 ### Output: 
 
