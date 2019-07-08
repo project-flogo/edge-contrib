@@ -50,6 +50,11 @@
       "description": "The topic to publish to"
     },
     {
+      "name": "retain",
+      "type": "boolean",
+      "description": "Retain messages"
+    },
+    {
       "name": "sslConfig",
       "type": "object",
       "description": "Optional SSL Settings",

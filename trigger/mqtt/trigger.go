@@ -201,7 +201,7 @@ func (t *Trigger) getHanlder(handler *clientHandler) func(mqtt.Client, mqtt.Mess
 				if err != nil {
 					return
 				}
-				token := client.Publish(handler.settings.ReplyTopic, qos, false, string(dataJson))
+				token := client.Publish(handler.settings.ReplyTopic, qos, handler.settings.Retain, string(dataJson))
 				sent := token.WaitTimeout(5000 * time.Millisecond)
 				if !sent {
 					t.logger.Errorf("Timeout occurred while trying to publish reply to topic '%s'", handler.settings.ReplyTopic)

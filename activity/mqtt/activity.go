@@ -1,12 +1,13 @@
 package mqtt
 
 import (
+	"strings"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/project-flogo/core/activity"
 	"github.com/project-flogo/core/data/metadata"
 	"github.com/project-flogo/core/support/log"
 	"github.com/project-flogo/core/support/ssl"
-	"strings"
 )
 
 var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
@@ -83,7 +84,7 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		return true, err
 	}
 
-	if token := a.client.Publish(a.settings.Topic, byte(a.settings.Qos), true, input.Message); token.Wait() && token.Error() != nil {
+	if token := a.client.Publish(a.settings.Topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
 		ctx.Logger().Debugf("Error in publishing: %v", err)
 		return true, token.Error()
 	}

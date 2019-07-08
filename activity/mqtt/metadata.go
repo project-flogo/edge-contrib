@@ -2,11 +2,12 @@ package mqtt
 
 type Settings struct {
 	Broker       string                 `md:"broker,required"` // The broker URL
-	Id           string                 `md:"id,required"`    // The id of client
-	Username     string                 `md:"username"`       // The user's name
-	Password     string                 `md:"password"`       // The user's password
-	Store        string                 `md:"store"`          // The store for message persistence
-	CleanSession bool                   `md:"cleanSession"`   // Clean session flag
+	Id           string                 `md:"id,required"`     // The id of client
+	Username     string                 `md:"username"`        // The user's name
+	Password     string                 `md:"password"`        // The user's password
+	Store        string                 `md:"store"`           // The store for message persistence
+	CleanSession bool                   `md:"cleanSession"`    // Clean session flag
+	Retain       bool                   `md:"retain,required"`
 	Topic        string                 `md:"topic,required"` // The topic to publish to
 	Qos          int                    `md:"qos"`            // The Quality of Service
 	SSLConfig    map[string]interface{} `md:"sslConfig"`      // SSL Configuration
