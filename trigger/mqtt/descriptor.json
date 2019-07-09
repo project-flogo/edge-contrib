@@ -113,7 +113,7 @@
         {
           "name": "retain",
           "type": "boolean",
-          "description": "The Retain of Message"
+          "description": "Retain Messages"
         },
         {
           "name": "replyTopic",

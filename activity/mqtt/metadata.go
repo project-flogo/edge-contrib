@@ -7,10 +7,10 @@ type Settings struct {
 	Password     string                 `md:"password"`        // The user's password
 	Store        string                 `md:"store"`           // The store for message persistence
 	CleanSession bool                   `md:"cleanSession"`    // Clean session flag
-	Retain       bool                   `md:"retain,required"`
-	Topic        string                 `md:"topic,required"` // The topic to publish to
-	Qos          int                    `md:"qos"`            // The Quality of Service
-	SSLConfig    map[string]interface{} `md:"sslConfig"`      // SSL Configuration
+	Retain       bool                   `md:"retain,required"` // Retain Messages
+	Topic        string                 `md:"topic,required"`  // The topic to publish to
+	Qos          int                    `md:"qos"`             // The Quality of Service
+	SSLConfig    map[string]interface{} `md:"sslConfig"`       // SSL Configuration
 }
 
 type Input struct {
