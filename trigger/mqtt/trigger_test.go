@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"testing"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 
@@ -215,7 +216,11 @@ func TestRestTrigger_getHanlder(t *testing.T) {
 	token = client.Publish("test/a/b/req/c/d", 0, true, []byte(`{"message": "hello world"}`))
 	token.Wait()
 	assert.Nil(t, token.Error())
-	<-done
+	select {
+	case <-done:
+	case <-time.Tick(time.Second):
+		t.Fatal("didn't get message in time")
+	}
 	client.Disconnect(50)
 
 	err = trg.Stop()
