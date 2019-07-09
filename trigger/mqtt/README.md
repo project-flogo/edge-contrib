@@ -18,7 +18,7 @@ flogo install github.com/project-flogo/edge-contrib/trigger/mqtt
 | Name          | Type   | Description
 | :---          | :---   | :---
 | broker        | string | The broker URL - ***REQUIRED***
-| id            | string | The id of client - ***REQUIRED*** 
+| id            | string | The id of client - ***REQUIRED***
 | username      | string | The user's name
 | password      | string | The user's password
 | store         | string | The store for message persistence
@@ -26,8 +26,8 @@ flogo install github.com/project-flogo/edge-contrib/trigger/mqtt
 | keepAlive     | int    | Keep Alive time in seconds
 | autoReconnect | bool   | Enable Auto-Reconnect
 | sslConfig     | object | SSL configuration
- 
- #### *sslConfig* Object: 
+
+ #### *sslConfig* Object:
  | Property      | Type   | Description
  |:---           | :---   | :---     
  | skipVerify    | bool   | Skip SSL validation, defaults to true
@@ -35,9 +35,9 @@ flogo install github.com/project-flogo/edge-contrib/trigger/mqtt
  | caFile        | string | The path to PEM encoded root certificates file
  | certFile      | string | The path to PEM encoded client certificate
  | keyFile       | string | The path to PEM encoded client key
- 
+
  *Note: used if broker URI is ssl*
- 
+
 ### Handler Settings
 | Name       | Type   | Description
 | :---       | :---   | :---
@@ -45,12 +45,13 @@ flogo install github.com/project-flogo/edge-contrib/trigger/mqtt
 | replyTopic | string | The topic to reply on   
 | qos        | int    | The Quality of Service
 
-### Output: 
+### Output:
 
-| Name    | Type   | Description
-| :---    | :---   | :---
-| message | string | The message recieved
-    
+| Name        | Type   | Description
+| :---        | :---   | :---
+| message     | string | The message received
+| topicParams | params | The topic parameters
+
 ### Reply:
 
 | Name  | Type   | Description

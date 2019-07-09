@@ -23,7 +23,8 @@ type HandlerSettings struct {
 }
 
 type Output struct {
-	Message string `md:"message"` // The message recieved
+	Message     string            `md:"message"`     // The message recieved
+	TopicParams map[string]string `md:"topicParams"` // The topic parameters
 }
 
 type Reply struct {
@@ -32,7 +33,8 @@ type Reply struct {
 
 func (o *Output) ToMap() map[string]interface{} {
 	return map[string]interface{}{
-		"message": o.Message,
+		"message":     o.Message,
+		"topicParams": o.TopicParams,
 	}
 }
 
@@ -40,6 +42,10 @@ func (o *Output) FromMap(values map[string]interface{}) error {
 
 	var err error
 	o.Message, err = coerce.ToString(values["message"])
+	if err != nil {
+		return err
+	}
+	o.TopicParams, err = coerce.ToParams(values["topicParams"])
 	if err != nil {
 		return err
 	}
