@@ -38,6 +38,9 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
 
  *Note: used if broker URI is ssl*
 
+#### Topics
+MQTT wildcard syntax is supported. For example if the topic is '/x/+/y/#' then '+' will be substituted with the value stored in `topicParams` `input` key '0' and '#' with key '1'. This can also be done with names: '/x/+param1/y/#param2'. The keys used for substitution are now 'param1' and 'param2'
+
 ### Input:
 
 | Name        | Type   | Description

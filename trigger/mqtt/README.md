@@ -45,6 +45,9 @@ flogo install github.com/project-flogo/edge-contrib/trigger/mqtt
 | replyTopic | string | The topic to reply on   
 | qos        | int    | The Quality of Service
 
+#### Topics
+MQTT wildcard syntax is supported. For example if the topic is '/x/+/y/#' then the `topicParams` `output` will be populated with the wildcard values. The first wildcard will be in `topicParams` with key '0' and the second with key '1'. Topic wildcards can also be given a name: '/x/+param1/y/#param2'. Then the names 'param1' and 'param2' can be used to access the wildcards in the `topicParams` `output`.
+
 ### Output:
 
 | Name        | Type   | Description
