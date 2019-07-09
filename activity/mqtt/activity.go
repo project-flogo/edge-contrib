@@ -1,6 +1,8 @@
 package mqtt
 
 import (
+	"strconv"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/project-flogo/core/activity"
 	"github.com/project-flogo/core/data/metadata"
@@ -13,6 +15,81 @@ var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
 
 func init() {
 	_ = activity.Register(&Activity{}, New)
+}
+
+// TokenType is a type of token
+type TokenType int
+
+const (
+	// Literal is a literal token type
+	Literal TokenType = iota
+	// SingleLevel is a single level wildcard
+	SingleLevel
+	// MultiLevel is a multi level wildcard
+	MultiLevel
+)
+
+// Token is a MQTT topic token
+type Token struct {
+	TokenType TokenType
+	Token     string
+}
+
+// Topic is a parsed topic
+type Topic []Token
+
+// ParseTopic parses the topic
+func ParseTopic(topic string) Topic {
+	var parsed Topic
+	parts, index := strings.Split(topic, "/"), 0
+	for _, part := range parts {
+		if strings.HasPrefix(part, "+") {
+			token := strings.TrimPrefix(part, "+")
+			if token == "" {
+				token = strconv.Itoa(index)
+				index++
+			}
+			parsed = append(parsed, Token{
+				TokenType: SingleLevel,
+				Token:     token,
+			})
+		} else if strings.HasPrefix(part, "#") {
+			token := strings.TrimPrefix(part, "#")
+			if token == "" {
+				token = strconv.Itoa(index)
+				index++
+			}
+			parsed = append(parsed, Token{
+				TokenType: MultiLevel,
+				Token:     token,
+			})
+		} else {
+			parsed = append(parsed, Token{
+				TokenType: Literal,
+				Token:     part,
+			})
+		}
+	}
+	return parsed
+}
+
+// String generates a string for the topic with params
+func (t Topic) String(params map[string]string) string {
+	output := strings.Builder{}
+	for i, token := range t {
+		if i > 0 {
+			output.WriteString("/")
+		}
+		switch token.TokenType {
+		case Literal:
+			output.WriteString(token.Token)
+		case SingleLevel:
+			fallthrough
+		case MultiLevel:
+			output.WriteString(params[token.Token])
+		}
+	}
+	return output.String()
 }
 
 func New(ctx activity.InitContext) (activity.Activity, error) {
@@ -60,13 +137,18 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, token.Error()
 	}
 
-	act := &Activity{client: mqttClient, settings: settings}
+	act := &Activity{
+		client:   mqttClient,
+		settings: settings,
+		topic:    ParseTopic(settings.Topic),
+	}
 	return act, nil
 }
 
 type Activity struct {
 	settings *Settings
 	client   mqtt.Client
+	topic    Topic
 }
 
 func (a *Activity) Metadata() *activity.Metadata {
@@ -83,7 +165,11 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		return true, err
 	}
 
-	if token := a.client.Publish(a.settings.Topic, byte(a.settings.Qos), true, input.Message); token.Wait() && token.Error() != nil {
+	topic := a.settings.Topic
+	if params := input.TopicParams; len(params) > 0 {
+		topic = a.topic.String(params)
+	}
+	if token := a.client.Publish(topic, byte(a.settings.Qos), true, input.Message); token.Wait() && token.Error() != nil {
 		ctx.Logger().Debugf("Error in publishing: %v", err)
 		return true, token.Error()
 	}

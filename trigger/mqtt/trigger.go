@@ -114,6 +114,7 @@ MATCHER:
 	return output
 }
 
+// String generates a string for the topic
 func (t Topic) String() string {
 	output := strings.Builder{}
 	for i, token := range t {

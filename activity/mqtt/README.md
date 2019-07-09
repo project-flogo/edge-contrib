@@ -26,8 +26,8 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
 | topic        | string | The topic to publish to - ***REQUIRED***
 | qos          | int    | The quality of service
 | sslConfig    | object | SSL configuration
- 
- #### *sslConfig* Object: 
+
+ #### *sslConfig* Object:
  | Property      | Type   | Description
  |:---           | :---   | :---     
  | skipVerify    | bool   | Skip SSL validation, defaults to true
@@ -35,15 +35,16 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
  | caFile        | string | The path to PEM encoded root certificates file
  | certFile      | string | The path to PEM encoded client certificate
  | keyFile       | string | The path to PEM encoded client key
- 
- *Note: used if broker URI is ssl*
- 
-### Input: 
 
-| Name    | Type   | Description
-| :---    | :---   | :---
-| message | string | The message to send  
-    
+ *Note: used if broker URI is ssl*
+
+### Input:
+
+| Name        | Type   | Description
+| :---        | :---   | :---
+| message     | string | The message to send  
+| topicParams | params | The topic parameters
+
 ### Output:
 
 | Name  | Type   | Description

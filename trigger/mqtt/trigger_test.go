@@ -119,7 +119,7 @@ const testConfigLocalgetHandler string = `{
 func TestParseTopic(t *testing.T) {
 	test := func(input, output string) {
 		parsed := ParseTopic(input)
-		assert.Equal(t, parsed.String(), output)
+		assert.Equal(t, output, parsed.String())
 	}
 	test("/a/+x/b/#y", "/a/+/b/#")
 	test("/a/+/b/#", "/a/+/b/#")
@@ -139,7 +139,7 @@ func TestTopic_Match(t *testing.T) {
 		parsed, input := ParseTopic(match), ParseTopic(in)
 		found := parsed.Match(input)
 		for key, value := range params {
-			assert.Equal(t, value, found[key])
+			assert.Equal(t, found[key], value)
 		}
 	}
 	test("/a/+x/b/#y", "/a/x/b/y/z/", map[string]string{"x": "x", "y": "y/z/"})
