@@ -20,7 +20,7 @@ const testConfig string = `{
         "certstore": "*****8",
         "cleansess": false,
         "enableTLS": true,
-				"id": "FlogoTest237123",
+		"id": "FlogoTest237123",
         "keepalive": 30,
         "password": "****",
         "store": ":memory:",
