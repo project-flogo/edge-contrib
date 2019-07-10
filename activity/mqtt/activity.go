@@ -23,10 +23,8 @@ type TokenType int
 const (
 	// Literal is a literal token type
 	Literal TokenType = iota
-	// SingleLevel is a single level wildcard
-	SingleLevel
-	// MultiLevel is a multi level wildcard
-	MultiLevel
+	// Substitution is a parameter substitution
+	Substitution
 )
 
 // Token is a MQTT topic token
@@ -43,24 +41,14 @@ func ParseTopic(topic string) Topic {
 	var parsed Topic
 	parts, index := strings.Split(topic, "/"), 0
 	for _, part := range parts {
-		if strings.HasPrefix(part, "+") {
-			token := strings.TrimPrefix(part, "+")
+		if strings.HasPrefix(part, ":") {
+			token := strings.TrimPrefix(part, ":")
 			if token == "" {
 				token = strconv.Itoa(index)
 				index++
 			}
 			parsed = append(parsed, Token{
-				TokenType: SingleLevel,
-				Token:     token,
-			})
-		} else if strings.HasPrefix(part, "#") {
-			token := strings.TrimPrefix(part, "#")
-			if token == "" {
-				token = strconv.Itoa(index)
-				index++
-			}
-			parsed = append(parsed, Token{
-				TokenType: MultiLevel,
+				TokenType: Substitution,
 				Token:     token,
 			})
 		} else {
@@ -83,10 +71,13 @@ func (t Topic) String(params map[string]string) string {
 		switch token.TokenType {
 		case Literal:
 			output.WriteString(token.Token)
-		case SingleLevel:
-			fallthrough
-		case MultiLevel:
-			output.WriteString(params[token.Token])
+		case Substitution:
+			if value, ok := params[token.Token]; ok {
+				output.WriteString(value)
+			} else {
+				output.WriteString(":")
+				output.WriteString(token.Token)
+			}
 		}
 	}
 	return output.String()

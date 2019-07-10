@@ -43,17 +43,17 @@ func TestParseTopic(t *testing.T) {
 		parsed := ParseTopic(input)
 		assert.Equal(t, parsed.String(params), output)
 	}
-	test("/a/+x/b/#y", "/a/test/b/j/k", map[string]string{"x": "test", "y": "j/k"})
-	test("/a/+/b/#", "/a/test/b/j/k", map[string]string{"0": "test", "1": "j/k"})
-	test("a/+/b/#", "a/test/b/j/k", map[string]string{"0": "test", "1": "j/k"})
-	test("a/+/b", "a/test/b", map[string]string{"0": "test"})
-	test("a/+/b/", "a/test/b/", map[string]string{"0": "test"})
+	test("/a/:x/b/:y", "/a/test/b/j/k", map[string]string{"x": "test", "y": "j/k"})
+	test("/a/:/b/:", "/a/test/b/j/k", map[string]string{"0": "test", "1": "j/k"})
+	test("a/:/b/:", "a/test/b/j/k", map[string]string{"0": "test", "1": "j/k"})
+	test("a/:/b", "a/test/b", map[string]string{"0": "test"})
+	test("a/:/b/", "a/test/b/", map[string]string{"0": "test"})
 	test("", "", map[string]string{})
-	test("+", "test", map[string]string{"0": "test"})
-	test("#", "test", map[string]string{"0": "test"})
+	test(":", "test", map[string]string{"0": "test"})
+	test(":", "test", map[string]string{"0": "test"})
 	test("/", "/", map[string]string{})
-	test("/+", "/test", map[string]string{"0": "test"})
-	test("/#", "/test", map[string]string{"0": "test"})
+	test("/:", "/test", map[string]string{"0": "test"})
+	test("/:", "/test", map[string]string{"0": "test"})
 	test("/a/b", "/a/b", map[string]string{})
 }
 
@@ -86,7 +86,7 @@ func TestEval(t *testing.T) {
 	settings := Settings{
 		Broker: "tcp://localhost:1883",
 		Id:     "TestX",
-		Topic:  "/x/+a/y/#b",
+		Topic:  "/x/:a/y/:b",
 	}
 	init := test.NewActivityInitContext(settings, nil)
 	act, err := New(init)
