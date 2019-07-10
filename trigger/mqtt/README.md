@@ -53,6 +53,7 @@ MQTT wildcard syntax is supported. For example if the topic is '/x/+/y/#' then t
 | Name        | Type   | Description
 | :---        | :---   | :---
 | message     | string | The message received
+| topic       | string | The MQTT topic
 | topicParams | params | The topic parameters
 
 ### Reply:

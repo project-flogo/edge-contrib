@@ -297,7 +297,7 @@ func (t *Trigger) getHanlder(handler *clientHandler, parsed Topic) func(mqtt.Cli
 
 		t.logger.Debugf("Topic[%s] - Payload Recieved: %s", topic, payload)
 
-		result, err := runHandler(handler.handler, payload, params)
+		result, err := runHandler(handler.handler, payload, topic, params)
 		if err != nil {
 			t.logger.Error("Error handling message: %v", err)
 			return
@@ -328,11 +328,12 @@ func (t *Trigger) getHanlder(handler *clientHandler, parsed Topic) func(mqtt.Cli
 }
 
 // RunHandler runs the handler and associated action
-func runHandler(handler trigger.Handler, payload string, params map[string]string) (map[string]interface{}, error) {
-
-	out := &Output{}
-	out.Message = payload
-	out.TopicParams = params
+func runHandler(handler trigger.Handler, payload, topic string, params map[string]string) (map[string]interface{}, error) {
+	out := &Output{
+		Message:     payload,
+		Topic:       topic,
+		TopicParams: params,
+	}
 
 	results, err := handler.Handle(context.Background(), out)
 	if err != nil {
