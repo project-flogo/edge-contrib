@@ -277,7 +277,8 @@ func (t *Trigger) Stop() error {
 
 	//unsubscribe from topics
 	for _, handler := range t.handlers {
-		t.logger.Debug("Unsubscribing from topic: ", handler.settings.Topic)
+		parsed := ParseTopic(handler.settings.Topic)
+		t.logger.Debug("Unsubscribing from topic: ", parsed.String())
 		if token := t.client.Unsubscribe(handler.settings.Topic); token.Wait() && token.Error() != nil {
 			t.logger.Errorf("Error unsubscribing from topic %s: %s", handler.settings.Topic, token.Error())
 		}
