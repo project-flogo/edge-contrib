@@ -1,7 +1,10 @@
 package mqtt
 
 import (
+
 	"strings"
+  "strconv"
+
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/project-flogo/core/activity"
@@ -14,6 +17,72 @@ var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
 
 func init() {
 	_ = activity.Register(&Activity{}, New)
+}
+
+// TokenType is a type of token
+type TokenType int
+
+const (
+	// Literal is a literal token type
+	Literal TokenType = iota
+	// Substitution is a parameter substitution
+	Substitution
+)
+
+// Token is a MQTT topic token
+type Token struct {
+	TokenType TokenType
+	Token     string
+}
+
+// Topic is a parsed topic
+type Topic []Token
+
+// ParseTopic parses the topic
+func ParseTopic(topic string) Topic {
+	var parsed Topic
+	parts, index := strings.Split(topic, "/"), 0
+	for _, part := range parts {
+		if strings.HasPrefix(part, ":") {
+			token := strings.TrimPrefix(part, ":")
+			if token == "" {
+				token = strconv.Itoa(index)
+				index++
+			}
+			parsed = append(parsed, Token{
+				TokenType: Substitution,
+				Token:     token,
+			})
+		} else {
+			parsed = append(parsed, Token{
+				TokenType: Literal,
+				Token:     part,
+			})
+		}
+	}
+	return parsed
+}
+
+// String generates a string for the topic with params
+func (t Topic) String(params map[string]string) string {
+	output := strings.Builder{}
+	for i, token := range t {
+		if i > 0 {
+			output.WriteString("/")
+		}
+		switch token.TokenType {
+		case Literal:
+			output.WriteString(token.Token)
+		case Substitution:
+			if value, ok := params[token.Token]; ok {
+				output.WriteString(value)
+			} else {
+				output.WriteString(":")
+				output.WriteString(token.Token)
+			}
+		}
+	}
+	return output.String()
 }
 
 func New(ctx activity.InitContext) (activity.Activity, error) {
@@ -61,13 +130,18 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		return nil, token.Error()
 	}
 
-	act := &Activity{client: mqttClient, settings: settings}
+	act := &Activity{
+		client:   mqttClient,
+		settings: settings,
+		topic:    ParseTopic(settings.Topic),
+	}
 	return act, nil
 }
 
 type Activity struct {
 	settings *Settings
 	client   mqtt.Client
+	topic    Topic
 }
 
 func (a *Activity) Metadata() *activity.Metadata {
