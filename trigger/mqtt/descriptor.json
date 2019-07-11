@@ -114,7 +114,17 @@
           "type": "int",
           "allowed": [0,1,2],
           "description": "The Quality of Service"
-        }
+        },
+        {
+          "name": "retain",
+          "type": "boolean",
+          "description": "Retain Messages"
+        },
+        {
+          "name": "replyTopic",
+          "type": "string",
+          "description": "The topic to reply to"
+        },
       ]
     }
   }

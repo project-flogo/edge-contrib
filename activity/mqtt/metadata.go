@@ -11,7 +11,9 @@ type Settings struct {
 	Password     string                 `md:"password"`        // The user's password
 	Store        string                 `md:"store"`           // The store for message persistence
 	CleanSession bool                   `md:"cleanSession"`    // Clean session flag
-	Topic        string                 `md:"topic,required"`  // The topic to publish to
+
+	Retain       bool                   `md:"retain"`          // Retain Messages
+  Topic        string                 `md:"topic,required"`  // The topic to publish to
 	Qos          int                    `md:"qos"`             // The Quality of Service
 	SSLConfig    map[string]interface{} `md:"sslConfig"`       // SSL Configuration
 }

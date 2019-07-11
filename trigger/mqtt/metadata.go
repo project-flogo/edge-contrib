@@ -20,6 +20,7 @@ type HandlerSettings struct {
 	Topic      string `md:"topic,required"` // The topic to listen on
 	ReplyTopic string `md:"replyTopic"`     // The topic to reply on
 	Qos        int    `md:"qos"`            // The Quality of Service
+	Retain     bool   `md:"retain"`         // Retain messages
 }
 
 type Output struct {
