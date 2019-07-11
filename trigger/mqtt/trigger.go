@@ -277,10 +277,10 @@ func (t *Trigger) Stop() error {
 
 	//unsubscribe from topics
 	for _, handler := range t.handlers {
-		parsed := ParseTopic(handler.settings.Topic)
-		t.logger.Debug("Unsubscribing from topic: ", parsed.String())
-		if token := t.client.Unsubscribe(handler.settings.Topic); token.Wait() && token.Error() != nil {
-			t.logger.Errorf("Error unsubscribing from topic %s: %s", handler.settings.Topic, token.Error())
+		topic := ParseTopic(handler.settings.Topic).String()
+		t.logger.Debug("Unsubscribing from topic: ", topic)
+		if token := t.client.Unsubscribe(topic); token.Wait() && token.Error() != nil {
+			t.logger.Errorf("Error unsubscribing from topic %s: %s", topic, token.Error())
 		}
 	}
 
