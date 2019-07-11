@@ -87,7 +87,12 @@
       {
         "name": "message",
         "type": "string",
-        "description": "The message recieved"
+        "description": "The message received"
+      },
+      {
+        "name": "topicParams",
+        "type": "params",
+        "description": "The topic parameters"
       }
     ],
     "reply": [
@@ -113,4 +118,3 @@
       ]
     }
   }
-  

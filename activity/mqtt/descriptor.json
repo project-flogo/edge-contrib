@@ -89,6 +89,11 @@
       "name": "message",
       "type": "string",
       "description": "The message to send"
+    },
+    {
+      "name": "topicParams",
+      "type": "params",
+      "description": "The topic parameters"
     }
   ],
   "output": [
