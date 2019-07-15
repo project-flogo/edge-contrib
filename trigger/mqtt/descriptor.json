@@ -124,7 +124,7 @@
           "name": "replyTopic",
           "type": "string",
           "description": "The topic to reply to"
-        },
+        }
       ]
     }
   }
