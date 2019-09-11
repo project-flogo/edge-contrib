@@ -2,25 +2,29 @@ package mqtt
 
 import (
 	"github.com/project-flogo/core/data/coerce"
+	"github.com/project-flogo/core/support/connection"
 )
 
 type Settings struct {
-	Broker       string                 `md:"broker,required"` // The broker URL
-	Id           string                 `md:"id,required"`     // The id of client
+	Broker       string                 `md:"broker"` // The broker URL
+	Id           string                 `md:"id"`     // The id of client
 	Username     string                 `md:"username"`        // The user's name
 	Password     string                 `md:"password"`        // The user's password
 	Store        string                 `md:"store"`           // The store for message persistence
 	CleanSession bool                   `md:"cleanSession"`    // Clean session flag
 
 	Retain       bool                   `md:"retain"`          // Retain Messages
-  Topic        string                 `md:"topic,required"`  // The topic to publish to
+  	Topic        string                 `md:"topic,required"`  // The topic to publish to
 	Qos          int                    `md:"qos"`             // The Quality of Service
 	SSLConfig    map[string]interface{} `md:"sslConfig"`       // SSL Configuration
+	SharedConnection bool   			`md:"sharedconnection,required"`
+	
 }
 
 type Input struct {
 	Message     interface{}       `md:"message"`     // The message to send
 	TopicParams map[string]string `md:"topicParams"` // The topic parameters
+	Connection connection.Manager `md:"connection"`
 }
 
 type Output struct {
@@ -31,6 +35,7 @@ func (i *Input) ToMap() map[string]interface{} {
 	return map[string]interface{}{
 		"message":     i.Message,
 		"topicParams": i.TopicParams,
+		"connection": i.Connection,
 	}
 }
 
@@ -40,6 +45,9 @@ func (i *Input) FromMap(values map[string]interface{}) error {
 	i.TopicParams, err = coerce.ToParams(values["topicParams"])
 	if err != nil {
 		return err
+	}
+	if values["connection"] != nil {
+		i.Connection, err = coerce.ToConnection(values["connection"])
 	}
 	return nil
 }

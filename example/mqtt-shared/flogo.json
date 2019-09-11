@@ -1,0 +1,71 @@
+{
+  "name": "mqtt-shared",
+  "type": "flogo:app",
+  "version": "0.0.1",
+  "description": "",
+  "appModel": "1.0.0",
+  "imports": [
+    "github.com/project-flogo/contrib/activity/log",
+    "github.com/project-flogo/flow",
+    "github.com/project-flogo/edge-contrib/connections/mqtt",
+    "github.com/project-flogo/contrib/trigger/timer",
+    "github.com/project-flogo/edge-contrib/activity/mqtt"
+  ],
+  "triggers": [
+    {
+      "id": "flogo-time",
+      "ref": "#timer",
+      "settings": null,
+      "handlers": [
+        {
+          "settings": null,
+          "actions": [
+            {
+              "ref": "#flow",
+              "settings": {
+                "flowURI": "res://flow:test"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "connections":{
+    "mymqttconn":{
+      "ref":"github.com/project-flogo/edge-contrib/connections/mqtt",
+      "settings": {
+        "broker" : "tcp://localhost:1883",
+        "id": "sender_1"
+      }
+    }
+  },
+  "resources": [
+    {
+      "id": "flow:test",
+      "data": {
+        "name": "test",
+        "description": "A sample flow",
+        "tasks": [
+          {
+            "id": "Mqtt-Activity",
+            "name": "Send Mqtt Message using Shared Activity",
+            "activity": {
+              "ref": "github.com/project-flogo/edge-contrib/activity/mqtt",
+              "settings": {
+                "sharedconnection": true,
+                "topic":"led",
+                "qos": "2",
+                "retain":true
+              },
+              "input": {
+                "connection": "conn://mymqttconn",
+                "message": "SAmple"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

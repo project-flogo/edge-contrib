@@ -89,49 +89,55 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 	if err != nil {
 		return nil, err
 	}
+	if !settings.SharedConnection {
+	
+		options := initClientOption(ctx.Logger(), settings)
 
-	options := initClientOption(ctx.Logger(), settings)
+		if strings.HasPrefix(settings.Broker, "ssl") {
 
-	if strings.HasPrefix(settings.Broker, "ssl") {
+			cfg := &ssl.Config{}
 
-		cfg := &ssl.Config{}
+			if len(settings.SSLConfig) != 0 {
+				err := cfg.FromMap(settings.SSLConfig)
+				if err != nil {
+					return nil, err
+				}
 
-		if len(settings.SSLConfig) != 0 {
-			err := cfg.FromMap(settings.SSLConfig)
+				if _, set := settings.SSLConfig["skipVerify"]; !set {
+					cfg.SkipVerify = true
+				}
+				if _, set := settings.SSLConfig["useSystemCert"]; !set {
+					cfg.UseSystemCert = true
+				}
+			} else {
+				//using ssl but not configured, use defaults
+				cfg.SkipVerify = true
+				cfg.UseSystemCert = true
+			}
+
+			tlsConfig, err := ssl.NewClientTLSConfig(cfg)
 			if err != nil {
 				return nil, err
 			}
 
-			if _, set := settings.SSLConfig["skipVerify"]; !set {
-				cfg.SkipVerify = true
-			}
-			if _, set := settings.SSLConfig["useSystemCert"]; !set {
-				cfg.UseSystemCert = true
-			}
-		} else {
-			//using ssl but not configured, use defaults
-			cfg.SkipVerify = true
-			cfg.UseSystemCert = true
+			options.SetTLSConfig(tlsConfig)
 		}
 
-		tlsConfig, err := ssl.NewClientTLSConfig(cfg)
-		if err != nil {
-			return nil, err
+		mqttClient := mqtt.NewClient(options)
+
+		if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
+			return nil, token.Error()
 		}
 
-		options.SetTLSConfig(tlsConfig)
+		act := &Activity{
+			client:   mqttClient,
+			settings: settings,
+			topic:    ParseTopic(settings.Topic),
+		}
+		return act, nil
 	}
-
-	mqttClient := mqtt.NewClient(options)
-
-	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
-		return nil, token.Error()
-	}
-
 	act := &Activity{
-		client:   mqttClient,
 		settings: settings,
-		topic:    ParseTopic(settings.Topic),
 	}
 	return act, nil
 }
@@ -155,14 +161,23 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 	if err != nil {
 		return true, err
 	}
-
 	topic := a.settings.Topic
 	if params := input.TopicParams; len(params) > 0 {
 		topic = a.topic.String(params)
 	}
-	if token := a.client.Publish(topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
-		ctx.Logger().Debugf("Error in publishing: %v", err)
-		return true, token.Error()
+	
+	if input.Connection != nil {
+		ctx.Logger().Info("Using Shared Connection to publish..", input.Message)
+		if token := input.Connection.GetConnection().(mqtt.Client).Publish(topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
+			ctx.Logger().Info("Error in publishing..")
+			return true, token.Error()
+		}
+
+	}else {
+		if token := a.client.Publish(topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
+			ctx.Logger().Debugf("Error in publishing: %v", err)
+			return true, token.Error()
+		}
 	}
 
 	ctx.Logger().Debugf("Published Message: %v", input.Message)
