@@ -87,7 +87,12 @@
       {
         "name": "message",
         "type": "string",
-        "description": "The message recieved"
+        "description": "The message received"
+      },
+      {
+        "name": "topicParams",
+        "type": "params",
+        "description": "The topic parameters"
       }
     ],
     "reply": [
@@ -109,8 +114,17 @@
           "type": "int",
           "allowed": [0,1,2],
           "description": "The Quality of Service"
+        },
+        {
+          "name": "retain",
+          "type": "boolean",
+          "description": "Retain Messages"
+        },
+        {
+          "name": "replyTopic",
+          "type": "string",
+          "description": "The topic to reply to"
         }
       ]
     }
   }
-  

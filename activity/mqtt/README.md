@@ -24,10 +24,11 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
 | store        | string | The store for message persistence
 | cleanSession | bool   | Clean session flag
 | topic        | string | The topic to publish to - ***REQUIRED***
+| retain       | bool   | Retain Messages       
 | qos          | int    | The quality of service
 | sslConfig    | object | SSL configuration
- 
- #### *sslConfig* Object: 
+
+ #### *sslConfig* Object:
  | Property      | Type   | Description
  |:---           | :---   | :---     
  | skipVerify    | bool   | Skip SSL validation, defaults to true
@@ -35,15 +36,19 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
  | caFile        | string | The path to PEM encoded root certificates file
  | certFile      | string | The path to PEM encoded client certificate
  | keyFile       | string | The path to PEM encoded client key
- 
- *Note: used if broker URI is ssl*
- 
-### Input: 
 
-| Name    | Type   | Description
-| :---    | :---   | :---
-| message | string | The message to send  
-    
+ *Note: used if broker URI is ssl*
+
+#### Topics
+A substitution syntax is supported. For example if the topic is '/x/:/y/:' then the first ':' will be substituted with the value stored in `topicParams` `input` key '0' and the second ':' with key '1'. This can also be done with names: '/x/:param1/y/:param2'. The keys used for substitution are now 'param1' and 'param2'
+
+### Input:
+
+| Name        | Type   | Description
+| :---        | :---   | :---
+| message     | string | The message to send  
+| topicParams | params | The topic parameters
+
 ### Output:
 
 | Name  | Type   | Description
