@@ -89,57 +89,60 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 	if err != nil {
 		return nil, err
 	}
-	if !settings.SharedConnection {
+	if settings.SharedConnection {
+		
+		act := &Activity{
+			settings: settings,
+		}
+		return act, nil
+	}
 	
-		options := initClientOption(ctx.Logger(), settings)
+	options := initClientOption(ctx.Logger(), settings)
 
-		if strings.HasPrefix(settings.Broker, "ssl") {
+	if strings.HasPrefix(settings.Broker, "ssl") {
 
-			cfg := &ssl.Config{}
+		cfg := &ssl.Config{}
 
-			if len(settings.SSLConfig) != 0 {
-				err := cfg.FromMap(settings.SSLConfig)
-				if err != nil {
-					return nil, err
-				}
-
-				if _, set := settings.SSLConfig["skipVerify"]; !set {
-					cfg.SkipVerify = true
-				}
-				if _, set := settings.SSLConfig["useSystemCert"]; !set {
-					cfg.UseSystemCert = true
-				}
-			} else {
-				//using ssl but not configured, use defaults
-				cfg.SkipVerify = true
-				cfg.UseSystemCert = true
-			}
-
-			tlsConfig, err := ssl.NewClientTLSConfig(cfg)
+		if len(settings.SSLConfig) != 0 {
+			err := cfg.FromMap(settings.SSLConfig)
 			if err != nil {
 				return nil, err
 			}
 
-			options.SetTLSConfig(tlsConfig)
+			if _, set := settings.SSLConfig["skipVerify"]; !set {
+				cfg.SkipVerify = true
+			}
+			if _, set := settings.SSLConfig["useSystemCert"]; !set {
+				cfg.UseSystemCert = true
+			}
+		} else {
+			//using ssl but not configured, use defaults
+			cfg.SkipVerify = true
+			cfg.UseSystemCert = true
 		}
 
-		mqttClient := mqtt.NewClient(options)
-
-		if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
-			return nil, token.Error()
+		tlsConfig, err := ssl.NewClientTLSConfig(cfg)
+		if err != nil {
+			return nil, err
 		}
 
-		act := &Activity{
-			client:   mqttClient,
-			settings: settings,
-			topic:    ParseTopic(settings.Topic),
-		}
-		return act, nil
+		options.SetTLSConfig(tlsConfig)
 	}
+
+	mqttClient := mqtt.NewClient(options)
+
+	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
+		return nil, token.Error()
+	}
+
 	act := &Activity{
+		client:   mqttClient,
 		settings: settings,
+		topic:    ParseTopic(settings.Topic),
 	}
 	return act, nil
+	
+
 }
 
 type Activity struct {
