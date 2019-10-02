@@ -15,4 +15,4 @@ require (
 
 replace github.com/project-flogo/edge-contrib/connections/mqtt => ../../../connections/mqtt
 
-replace github.com/project-flogo/edge-contrib/activity/mqtt v0.0.0-20190715122927-42d43a13e2a9 => /Users/skothari-tibco/new-contrib/edge-contrib/edge-contrib/activity/mqtt/
+replace github.com/project-flogo/edge-contrib/activity/mqtt v0.0.0-20190715122927-42d43a13e2a9 => ../../../activity/mqtt
