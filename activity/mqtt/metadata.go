@@ -2,7 +2,6 @@ package mqtt
 
 import (
 	"github.com/project-flogo/core/data/coerce"
-	"github.com/project-flogo/core/support/connection"
 )
 
 type Settings struct {
@@ -14,17 +13,16 @@ type Settings struct {
 	CleanSession bool                   `md:"cleanSession"`    // Clean session flag
 
 	Retain       bool                   `md:"retain"`          // Retain Messages
-  	Topic        string                 `md:"topic,required"`  // The topic to publish to
+  	Topic        string                 `md:"topic"`           // The topic to publish to
 	Qos          int                    `md:"qos"`             // The Quality of Service
 	SSLConfig    map[string]interface{} `md:"sslConfig"`       // SSL Configuration
-	SharedConnection bool   			`md:"sharedconnection,required"`
+	SharedConnection string   		    `md:"sharedconnection"`
 	
 }
 
 type Input struct {
 	Message     interface{}       `md:"message"`     // The message to send
 	TopicParams map[string]string `md:"topicParams"` // The topic parameters
-	Connection connection.Manager `md:"connection"`
 }
 
 type Output struct {
@@ -35,7 +33,6 @@ func (i *Input) ToMap() map[string]interface{} {
 	return map[string]interface{}{
 		"message":     i.Message,
 		"topicParams": i.TopicParams,
-		"connection": i.Connection,
 	}
 }
 
@@ -46,9 +43,7 @@ func (i *Input) FromMap(values map[string]interface{}) error {
 	if err != nil {
 		return err
 	}
-	if values["connection"] != nil {
-		i.Connection, err = coerce.ToConnection(values["connection"])
-	}
+	
 	return nil
 }
 

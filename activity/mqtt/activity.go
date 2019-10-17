@@ -6,6 +6,7 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/project-flogo/core/activity"
+	"github.com/project-flogo/core/data/coerce"
 	"github.com/project-flogo/core/data/metadata"
 	"github.com/project-flogo/core/support/log"
 	"github.com/project-flogo/core/support/ssl"
@@ -89,10 +90,16 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 	if err != nil {
 		return nil, err
 	}
-	if settings.SharedConnection {
+	if settings.SharedConnection != "" {
 		
+		client, err := coerce.ToConnection(settings.SharedConnection)
+		if err != nil {
+			return nil, err
+		}
+
 		act := &Activity{
 			settings: settings,
+			client : client.GetConnection().(mqtt.Client),
 		}
 		return act, nil
 	}
@@ -169,18 +176,11 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 		topic = a.topic.String(params)
 	}
 	
-	if input.Connection != nil {
-		ctx.Logger().Info("Using Shared Connection to publish..", input.Message)
-		if token := input.Connection.GetConnection().(mqtt.Client).Publish(topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
-			ctx.Logger().Info("Error in publishing..")
-			return true, token.Error()
-		}
-
-	}else {
-		if token := a.client.Publish(topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
-			ctx.Logger().Debugf("Error in publishing: %v", err)
-			return true, token.Error()
-		}
+	ctx.Logger().Info("Publishing Message.", input.Message)
+	
+	if token := a.client.Publish(topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
+		ctx.Logger().Info("Error in publishing..")
+		return true, token.Error()
 	}
 
 	ctx.Logger().Debugf("Published Message: %v", input.Message)

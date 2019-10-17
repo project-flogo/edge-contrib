@@ -36,7 +36,10 @@
       "ref":"github.com/project-flogo/edge-contrib/connections/mqtt",
       "settings": {
         "broker" : "tcp://localhost:1883",
-        "id": "sender_1"
+        "id": "sender_1",
+        "topic":"led",
+        "qos": "2",
+        "retain":true
       }
     }
   },
@@ -53,13 +56,10 @@
             "activity": {
               "ref": "github.com/project-flogo/edge-contrib/activity/mqtt",
               "settings": {
-                "sharedconnection": true,
-                "topic":"led",
-                "qos": "2",
-                "retain":true
+                "sharedconnection": "conn://mymqttconn",
+                "topic" : "led"
               },
               "input": {
-                "connection": "conn://mymqttconn",
                 "message": "SAmple"
               }
             }
