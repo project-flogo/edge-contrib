@@ -7,7 +7,7 @@
   "imports": [
     "github.com/project-flogo/contrib/activity/log",
     "github.com/project-flogo/flow",
-    "github.com/project-flogo/edge-contrib/connections/mqtt",
+    "github.com/project-flogo/edge-contrib/connection/mqtt",
     "github.com/project-flogo/contrib/trigger/timer",
     "github.com/project-flogo/edge-contrib/activity/mqtt"
   ],
@@ -33,13 +33,10 @@
   ],
   "connections":{
     "mymqttconn":{
-      "ref":"github.com/project-flogo/edge-contrib/connections/mqtt",
+      "ref":"github.com/project-flogo/edge-contrib/connection/mqtt",
       "settings": {
         "broker" : "tcp://localhost:1883",
-        "id": "sender_1",
-        "topic":"led",
-        "qos": "2",
-        "retain":true
+        "id": "sender_1"
       }
     }
   },
@@ -57,7 +54,9 @@
               "ref": "github.com/project-flogo/edge-contrib/activity/mqtt",
               "settings": {
                 "sharedconnection": "conn://mymqttconn",
-                "topic" : "led"
+                "topic":"led",
+                "qos": "2",
+                "retain":true
               },
               "input": {
                 "message": "SAmple"

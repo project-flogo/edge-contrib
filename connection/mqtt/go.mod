@@ -1,4 +1,4 @@
-module github.com/project-flogo/edge-contrib/connections/mqtt
+module github.com/project-flogo/edge-contrib/connection/mqtt
 
 go 1.12
 

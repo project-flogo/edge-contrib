@@ -15,18 +15,12 @@ flogo install github.com/project-flogo/edge-contrib/activity/mqtt
 ## Configuration
 
 ### Settings:
-| Name         | Type   | Description
-| :---         | :---   | :---
-| broker       | string | The broker URL - ***REQUIRED***
-| id           | string | The id of client - ***REQUIRED***
-| username     | string | The name of the user
-| password     | string | The password of the user
-| store        | string | The store for message persistence
-| cleanSession | bool   | Clean session flag
-| topic        | string | The topic to publish to - ***REQUIRED***
-| retain       | bool   | Retain Messages       
-| qos          | int    | The quality of service
-| sslConfig    | object | SSL configuration
+| Name                | Type   | Description
+| :---                | :---   | :---
+| topic               | string | The topic to publish to - ***REQUIRED***
+| retain              | bool   | Retain Messages       
+| qos                 | int    | The quality of service
+| sharedconnection    | string | Reference to Mqtt Connection
 
  #### *sslConfig* Object:
  | Property      | Type   | Description
@@ -76,3 +70,5 @@ A substitution syntax is supported. For example if the topic is '/x/:/y/:' then 
   }
 }
 ```
+
+For More Information on Mqtt SharedConnection please [visit](../connection/mqtt)

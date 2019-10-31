@@ -9,7 +9,7 @@ import (
 
 func init() {
 
-	connection.RegisterManagerFactory(&Factory{})
+	_ = connection.RegisterManagerFactory(&Factory{})
 }
 
 type Settings struct {
