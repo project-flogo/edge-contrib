@@ -261,12 +261,15 @@ func (t *Trigger) Start() error {
 
 	for _, handler := range t.handlers {
 		parsed := ParseTopic(handler.settings.Topic)
-		if token := client.Subscribe(parsed.String(), byte(handler.settings.Qos), t.getHanlder(handler, parsed)); token.Wait() && token.Error() != nil {
-			t.logger.Errorf("Error subscribing to topic %s: %s", handler.settings.Topic, token.Error())
-			return token.Error()
-		}
-
-		t.logger.Debugf("Subscribed to topic: %s", handler.settings.Topic)
+		go func(){
+			t.logger.Debugf("Subscribed to topic: %s", handler.settings.Topic)
+			for {
+				if token := client.Subscribe(parsed.String(), byte(handler.settings.Qos), t.getHanlder(handler, parsed)); token.Wait() && token.Error() != nil {
+					t.logger.Errorf("Error subscribing to topic %s: %s", handler.settings.Topic, token.Error())
+					return token.Error()
+				}
+			}
+		}()
 	}
 
 	return nil
