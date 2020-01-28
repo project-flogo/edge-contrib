@@ -266,7 +266,7 @@ func (t *Trigger) Start() error {
 			for {
 				if token := client.Subscribe(parsed.String(), byte(handler.settings.Qos), t.getHanlder(handler, parsed)); token.Wait() && token.Error() != nil {
 					t.logger.Errorf("Error subscribing to topic %s: %s", handler.settings.Topic, token.Error())
-					return token.Error()
+					
 				}
 			}
 		}()
