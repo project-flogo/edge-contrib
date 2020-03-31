@@ -90,6 +90,11 @@
         "description": "The message received"
       },
       {
+        "name": "topic",
+        "type": "string",
+        "description": "The Mqtt Topic."
+      },
+      {
         "name": "topicParams",
         "type": "params",
         "description": "The topic parameters"
