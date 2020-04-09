@@ -1,14 +1,14 @@
 package mqtt
 
 import (
+	"github.com/project-flogo/core/support/connection"
 	"strconv"
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/project-flogo/core/activity"
+	"github.com/project-flogo/core/data/coerce"
 	"github.com/project-flogo/core/data/metadata"
-	"github.com/project-flogo/core/support/log"
-	"github.com/project-flogo/core/support/ssl"
 )
 
 var activityMd = activity.ToMetadata(&Settings{}, &Input{}, &Output{})
@@ -89,8 +89,22 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 	if err != nil {
 		return nil, err
 	}
+	if settings.SharedConnection != "" {
 
-	options := initClientOption(ctx.Logger(), settings)
+		client, err := coerce.ToConnection(settings.SharedConnection)
+		if err != nil {
+			return nil, err
+		}
+
+		act := &Activity{
+			settings: settings,
+			connManager: client,
+		}
+		return act, nil
+	}
+
+	return nil, nil
+	/*options := initClientOption(ctx.Logger(), settings)
 
 	if strings.HasPrefix(settings.Broker, "ssl") {
 
@@ -134,12 +148,15 @@ func New(ctx activity.InitContext) (activity.Activity, error) {
 		topic:    ParseTopic(settings.Topic),
 	}
 	return act, nil
+	*/
+
 }
 
 type Activity struct {
 	settings *Settings
 	client   mqtt.Client
 	topic    Topic
+	connManager connection.Manager
 }
 
 func (a *Activity) Metadata() *activity.Metadata {
@@ -155,13 +172,15 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 	if err != nil {
 		return true, err
 	}
-
 	topic := a.settings.Topic
 	if params := input.TopicParams; len(params) > 0 {
 		topic = a.topic.String(params)
 	}
-	if token := a.client.Publish(topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
-		ctx.Logger().Debugf("Error in publishing: %v", err)
+	
+	ctx.Logger().Info("Publishing Message.", input.Message)
+
+	if token := a.connManager.GetConnection().(mqtt.Client).Publish(topic, byte(a.settings.Qos), a.settings.Retain, input.Message); token.Wait() && token.Error() != nil {
+		ctx.Logger().Info("Error in publishing..")
 		return true, token.Error()
 	}
 
@@ -170,6 +189,7 @@ func (a *Activity) Eval(ctx activity.Context) (done bool, err error) {
 	return true, nil
 }
 
+/*
 func initClientOption(logger log.Logger, settings *Settings) *mqtt.ClientOptions {
 
 	opts := mqtt.NewClientOptions()
@@ -186,3 +206,4 @@ func initClientOption(logger log.Logger, settings *Settings) *mqtt.ClientOptions
 
 	return opts
 }
+*/
