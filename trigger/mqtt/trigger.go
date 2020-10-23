@@ -140,6 +140,7 @@ type Trigger struct {
 	logger   log.Logger
 	options  *mqtt.ClientOptions
 	client   mqtt.Client
+	stop     chan struct{}
 }
 type clientHandler struct {
 	//client mqtt.Client
@@ -209,6 +210,8 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 
 	t.logger.Debugf("Client options: %v", options)
 
+	t.stop = make(chan struct{}, 1)
+
 	t.handlers = make(map[string]*clientHandler)
 
 	for _, handler := range ctx.GetHandlers() {
@@ -250,23 +253,11 @@ func initClientOption(settings *Settings) *mqtt.ClientOptions {
 
 // Start implements trigger.Trigger.Start
 func (t *Trigger) Start() error {
-
 	client := mqtt.NewClient(t.options)
-
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return token.Error()
-	}
-
 	t.client = client
 
-	for _, handler := range t.handlers {
-		parsed := ParseTopic(handler.settings.Topic)
-		if token := client.Subscribe(parsed.String(), byte(handler.settings.Qos), t.getHanlder(handler, parsed)); token.Wait() && token.Error() != nil {
-			t.logger.Errorf("Error subscribing to topic %s: %s", handler.settings.Topic, token.Error())
-			return token.Error()
-		}
-
-		t.logger.Debugf("Subscribed to topic: %s", handler.settings.Topic)
+	if err := t.connect(); err != nil {
+		return err
 	}
 
 	return nil
@@ -286,10 +277,63 @@ func (t *Trigger) Stop() error {
 
 	t.client.Disconnect(250)
 
+	t.stop <- struct{}{}
+
 	return nil
 }
 
-func (t *Trigger) getHanlder(handler *clientHandler, parsed Topic) func(mqtt.Client, mqtt.Message) {
+// Connect to the configured MQTT broker. If connection was established successful it subscribes to each configured topic.
+func (t *Trigger) connect() error {
+	if t.settings.AutoReconnect {
+		go func() {
+		CONNECT:
+			for {
+				select {
+				case <-t.stop:
+					return
+				default:
+					if token := t.client.Connect(); token.Wait() && token.Error() != nil {
+						t.logger.Errorf("Could not connect to %s: %s. Try to reconnect in 5 seconds", t.settings.Broker, token.Error())
+						time.Sleep(time.Second * 5)
+						continue
+					}
+
+					// If subscribing to topic fails, should we stop the trigger or just keep it running?
+					if err := t.subscribe(); err != nil {
+						t.logger.Errorf("Failed to subscribe: %s", err.Error())
+					}
+
+					break CONNECT
+				}
+			}
+		}()
+	} else {
+		if token := t.client.Connect(); token.Wait() && token.Error() != nil {
+			return token.Error()
+		}
+
+		if err := t.subscribe(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (t *Trigger) subscribe() error {
+	for _, handler := range t.handlers {
+		parsed := ParseTopic(handler.settings.Topic)
+		if token := t.client.Subscribe(parsed.String(), byte(handler.settings.Qos), t.getHandler(handler, parsed)); token.Wait() && token.Error() != nil {
+			t.logger.Errorf("Error subscribing to topic %s: %s", handler.settings.Topic, token.Error())
+			return token.Error()
+		}
+
+		t.logger.Debugf("Subscribed to topic: %s", handler.settings.Topic)
+	}
+
+	return nil
+}
+
+func (t *Trigger) getHandler(handler *clientHandler, parsed Topic) func(mqtt.Client, mqtt.Message) {
 	return func(client mqtt.Client, msg mqtt.Message) {
 		topic := msg.Topic()
 		qos := msg.Qos()
