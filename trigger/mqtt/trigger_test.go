@@ -96,7 +96,7 @@ const testConfigLocalgetHandler string = `{
 				"id": "trigger1-mqtt",
 				"ref": "github.com/project-flogo/device-contrib/trigger/mqtt",
 				"settings": {
-					"autoreconnect": true,
+					"autoReconnect": true,
 			        "broker": "tcp://localhost:1883",
 			        "cleansess": false,
 			        "enableTLS": false,
@@ -180,6 +180,58 @@ func TestRestTrigger_Initialize(t *testing.T) {
 
 	err = trg.Start()
 	assert.Nil(t, err)
+
+	err = trg.Stop()
+	assert.Nil(t, err)
+}
+
+func TestTrigger_Start_Reconnect(t *testing.T) {
+
+	command := exec.Command("docker", "stop", "mqtt")
+	command.Run()
+
+	f := &Factory{}
+
+	config := &trigger.Config{}
+	err := json.Unmarshal([]byte(testConfigLocalgetHandler), config)
+	assert.Nil(t, err)
+
+	done := make(chan bool, 1)
+	actions := map[string]action.Action{"dummyTest": test.NewDummyAction(func() {
+		done <- true
+	})}
+
+	trg, err := test.InitTrigger(f, config, actions)
+	assert.Nil(t, err)
+	assert.NotNil(t, trg)
+
+	err = trg.Start()
+	assert.Nil(t, err)
+
+	command = exec.Command("docker", "start", "mqtt")
+	err = command.Run()
+	assert.Nil(t, err)
+
+	// Give the broker a second to start
+	time.Sleep(time.Second * 1)
+
+	options := mqtt.NewClientOptions()
+	options.AddBroker("tcp://localhost:1883")
+	options.SetClientID("TestAbc123")
+	client := mqtt.NewClient(options)
+	token := client.Connect()
+	token.Wait()
+	assert.Nil(t, token.Error())
+
+	token = client.Publish("test/a/b/req/c/d", 0, true, []byte(`{"message": "hello world"}`))
+	token.Wait()
+	assert.Nil(t, token.Error())
+	select {
+	case <-done:
+	case <-time.Tick(time.Second * 10):
+		t.Fatal("didn't get message in time")
+	}
+	client.Disconnect(50)
 
 	err = trg.Stop()
 	assert.Nil(t, err)
